@@ -10,6 +10,7 @@ def get_project_paths() -> Dict[str, Path]:
     """
     project_root = Path(__file__).resolve().parent.parent.parent
     paths = {
+        'data' : project_root / 'data',
         'raw': project_root / 'data' / 'raw',
         'clean': project_root / 'data' / 'clean',
         'geo_mapping': project_root / 'data' / 'raw' / 'geo_mapping',

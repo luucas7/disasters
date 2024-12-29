@@ -25,7 +25,7 @@ def initialize_app() -> dash.Dash:
 def main() -> None:
     """Main function to initialize data and launch the dashboard."""
     paths = get_project_paths()
-    process_data(paths['raw'])
+    process_data(paths['data'])
     
     app = initialize_app()
     app.run_server(debug=True)
