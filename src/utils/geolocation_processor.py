@@ -1,6 +1,5 @@
 from typing import Optional, Dict, List, Tuple
 import pandas as pd
-import numpy as np
 from pathlib import Path
 from .geocoding_helper import GeocodingHelper
 
@@ -80,7 +79,7 @@ class GeolocationProcessor:
         # Ensure Latitude and Longitude columns exist
         for col in ['Latitude', 'Longitude']:
             if col not in result_df.columns:
-                result_df[col] = np.nan
+                result_df[col] = None
 
         # Process each row
         for idx, row in result_df.iterrows():

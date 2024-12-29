@@ -2,12 +2,12 @@ from typing import Optional, Dict, Any
 from pathlib import Path
 import pandas as pd
 from pandas import DataFrame
-import numpy as np
 from . import logger
 from .geolocation_processor import GeolocationProcessor
 from .clean_data import process_and_clean_data
 
 RAW_DISASTER_DATA_FILE = "public_emdat_custom_request_2024-12-26_cde276d8-746c-45c1-8c28-51e1fef813a6.xlsx"
+
 
 def convert_to_csv(excel_path: Path, output_path: Path) -> bool:
     """
@@ -25,6 +25,7 @@ def convert_to_csv(excel_path: Path, output_path: Path) -> bool:
     except Exception as e:
         logger.error(f"Error converting Excel to CSV: {e}")
         return False
+
 
 def read_raw_disaster_data(file_path: Path) -> Optional[DataFrame]:
     """
