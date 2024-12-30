@@ -1,17 +1,14 @@
+import json
 from typing import Optional, Dict, Any
 from pathlib import Path
 import pandas as pd
 from pandas import DataFrame
-import numpy as np
 from . import logger
+from .geolocation_processor import GeolocationProcessor
+from .clean_data import process_and_clean_data
 
 RAW_DISASTER_DATA_FILE = "public_emdat_custom_request_2024-12-26_cde276d8-746c-45c1-8c28-51e1fef813a6.xlsx"
-COLUMNS_TO_IGNORE = [
-    'External IDs', 'OFDA/BHA Response', 'Appeal', 'Declaration',
-    'AID Contribution (\'000 US$)', 'Reconstruction Costs (\'000 US$)',
-    'Reconstruction Costs, Adjusted (\'000 US$)', 'Insured Damage (\'000 US$)',
-    'Insured Damage, Adjusted (\'000 US$)', 'CPI', 'Entry Date', 'Last Update'
-]
+
 
 def convert_to_csv(excel_path: Path, output_path: Path) -> bool:
     """
@@ -20,9 +17,6 @@ def convert_to_csv(excel_path: Path, output_path: Path) -> bool:
     Args:
         excel_path: Path to Excel file
         output_path: Path for output CSV file
-        
-    Returns:
-        True if conversion successful, False otherwise
     """
     try:
         df = pd.read_excel(excel_path)
@@ -33,9 +27,13 @@ def convert_to_csv(excel_path: Path, output_path: Path) -> bool:
         logger.error(f"Error converting Excel to CSV: {e}")
         return False
 
+
 def read_raw_disaster_data(file_path: Path) -> Optional[DataFrame]:
     """
     Read the EMDAT disasters Excel file.
+    
+    Args:
+        file_path: Path to directory containing the Excel file
     """
     try:
         full_path = file_path / RAW_DISASTER_DATA_FILE
@@ -46,10 +44,6 @@ def read_raw_disaster_data(file_path: Path) -> Optional[DataFrame]:
         if df.empty:
             logger.error("The Excel file is empty")
             return None
-        
-        # Remove ignored columns if they exist
-        columns_to_keep = [col for col in df.columns if col not in COLUMNS_TO_IGNORE]
-        df = df[columns_to_keep]
             
         logger.info(f"Successfully read {len(df)} records")
         return df
@@ -61,34 +55,89 @@ def read_raw_disaster_data(file_path: Path) -> Optional[DataFrame]:
         logger.error(f"Error reading Excel file: {e}")
         return None
 
-
-def clean_disaster_data(df: DataFrame) -> DataFrame:
-    """
-    Clean the disasters data.
-    """
-    logger.info("Starting data cleaning process")
-    
-    #TODO
-    return df
-
-
-def process_data(raw_data_path: Path) -> Dict[str, Any]:
+def process_data(data_path: Path) -> Dict[str, Any]:
     """
     Main function to process the disasters data.
+    
+    Args:
+        data_path: Path to base data directory
     """
     try:
+        # Ensure directories exist
+        raw_path = data_path / 'raw'
+        clean_path = data_path / 'clean'
+        geo_path = data_path / 'geo_mapping'
+        
+        for path in [raw_path, clean_path, geo_path]:
+            path.mkdir(parents=True, exist_ok=True)
+        
+        if (clean_path / "cleaned_disasters.csv").exists():
+            df = pd.read_csv(clean_path / "cleaned_disasters.csv")
+            return {
+                "success": True,
+                "data": df
+            }
+        
         # Read raw data
-        raw_df = read_raw_disaster_data(raw_data_path)
+        raw_df = read_raw_disaster_data(raw_path)
         if raw_df is None:
             return {"success": False, "error": "Failed to read raw data"}
         
-        # Convert to CSV if needed
-        csv_path = raw_data_path / "raw_disasters.csv"
-        convert_to_csv(raw_data_path / RAW_DISASTER_DATA_FILE, csv_path)
+        # Convert to CSV for readability, bien mieux
+        csv_path = raw_path / "raw_disasters.csv"
+        convert_to_csv(raw_path / RAW_DISASTER_DATA_FILE, csv_path)
         
-        #TODO
-        return {"success": True}
+        # Clean data first
+        cleaned_df = process_and_clean_data(raw_df)
+        
+
+        # Save intermediate cleaned data
+        interim_path = clean_path / "cleaned_disasters.csv"
+        if cleaned_df is not None:
+            cleaned_df.to_csv(interim_path, index=False)
+        
+        # Process geolocation on cleaned data
+        #logger.info("Starting geolocation processing")
+        #geo_processor = GeolocationProcessor(geo_path)
+        #final_df = geo_processor.ProcessGeolocation(cleaned_df)
+        final_df = cleaned_df.copy()
+        
+        # Save final data with coordinates
+        #output_path = clean_path / "cleaned_disasters_with_coords.csv"
+        #final_df.to_csv(output_path, index=False)
+        #logger.info(f"Saved final data to {output_path}")
+        
+        return {
+            "success": True,
+            "data" : final_df
+        }
         
     except Exception as e:
-        logger.error(f"Error in data processing : {e}")
-        return {"success": False, "error": str(e)}
+        logger.error(f"Error in data processing: {str(e)}")
+        return {
+            "success": False, 
+            "error": str(e)
+        }
+        
+        
+def load_countries_geojson(geo_path: Path) -> Dict[str, Any]:
+    """
+    Load the countries GeoJSON data.
+    
+    Args:
+        geo_path: Path to the GeoJSON file
+    """
+    try:
+        geojson_path = geo_path / "countries.geojson"
+        
+        with open(geojson_path, 'r') as f:
+            geojson = json.load(f)
+        
+        return geojson
+        
+    except FileNotFoundError:
+        logger.error(f"GeoJSON file not found in {geo_path}")
+        return None
+    except Exception as e:
+        logger.error(f"Error reading GeoJSON file: {e}")
+        return None
