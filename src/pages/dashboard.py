@@ -1,10 +1,11 @@
-from dash import html
+from dash import html, dcc
 from dash.dependencies import Input, Output
 from typing import Any, Dict
 
 from src.components.navbar import Navbar
 from src.components.filter import Filter
 from src.components.main_content import MainContent
+from src.components.time_visualization import TimeVisualization
 
 def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
     """
@@ -15,31 +16,43 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
         geojson: GeoJSON data for the map
     """
     return html.Div([
-        # Main container with flex layout
-        html.Div([
-            Navbar()(),
-            Filter(data)(),
-            MainContent(data, geojson)()
-        ], className="flex h-screen")
+        dcc.Location(id='url', refresh=False),
+        Navbar()(),
+        html.Div(id='page-content', className="flex h-screen"),
+        dcc.Store(id='current-view', data='map')
     ])
 
 def init_callbacks(app: Any, data: Any, geojson: Dict[str, Any]) -> None:
-    """
-    Initialize dashboard callbacks.
+    """Initialize dashboard callbacks."""
     
-    Args:
-        app: Dash application instance
-        data: DataFrame containing the disaster data
-        geojson: GeoJSON data for the map
-    """
+    # Set suppress_callback_exceptions to True
+    app.config.suppress_callback_exceptions = True
+    
+    @app.callback(
+        Output('page-content', 'children'),
+        [Input('url', 'pathname')]
+    )
+    def display_page(pathname):
+        view_type = 'map' if pathname == '/map' else 'time' if pathname == '/time' else 'about'
+        
+        # Create components
+        filter_component = Filter(data, view_type)
+        main_content = MainContent(data, geojson, view_type)
+        
+        # Return their layouts directly
+        return [
+            filter_component.layout,
+            main_content.layout
+        ]
+
     @app.callback(
         Output('main-map', 'figure'),
-        [Input('year-filter', 'value'),
+        [Input('start-year-filter', 'value'),
+         Input('end-year-filter', 'value'),
          Input('disaster-type-filter', 'value'),
          Input('region-filter', 'value')]
     )
-    
-    def update_map(year: int, disaster_type: str, region: str) -> Dict[str, Any]:
+    def update_map(start_year: int, end_year: int, disaster_type: str, region: str) -> Dict[str, Any]:
         filtered_data = data.copy()
         
         # Appliquer les filtres
@@ -49,15 +62,14 @@ def init_callbacks(app: Any, data: Any, geojson: Dict[str, Any]) -> None:
         if region and region != 'All':
             filtered_data = filtered_data[filtered_data['Region'] == region]
         
-        # Traitement différent selon si on veut toutes les années ou une année spécifique
-        if year and year != 'All':
-            # Pour une année spécifique
-            filtered_data = filtered_data[filtered_data['Start Year'] == year]
-            # Compter le nombre de catastrophes par pays
-            counts_by_country = filtered_data.groupby('Country').size().reset_index(name='Disaster_Count')
-        else:
-            # Pour toutes les années, on somme le nombre total de catastrophes par pays
-            counts_by_country = filtered_data.groupby('Country').size().reset_index(name='Disaster_Count')
+        # Filtrer par année de début et de fin
+        filtered_data = filtered_data[
+            (filtered_data['Start Year'] >= start_year) & 
+            (filtered_data['Start Year'] <= end_year)
+        ]
+            
+        # Compter le nombre de catastrophes par pays
+        counts_by_country = filtered_data.groupby('Country').size().reset_index(name='Disaster_Count')
             
         return {
             'data': [{
@@ -85,3 +97,21 @@ def init_callbacks(app: Any, data: Any, geojson: Dict[str, Any]) -> None:
                 'autosize': True
             }
         }
+
+    @app.callback(
+        Output('time-series-chart', 'figure'),
+        [Input('start-year-filter', 'value'),
+         Input('end-year-filter', 'value'),
+         Input('group-by-filter', 'value'),
+         Input('impact-metric-filter', 'value')]
+    )
+    def update_time_series(start_year: int, end_year: int, group_by: str, metric: str) -> Dict[str, Any]:
+        # Filter data by year range
+        filtered_data = data[
+            (data['Start Year'] >= start_year) & 
+            (data['Start Year'] <= end_year)
+        ].copy()
+        
+        # Create visualization
+        time_viz = TimeVisualization(filtered_data)
+        return time_viz.create_figure(group_by, metric)

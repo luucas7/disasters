@@ -21,7 +21,8 @@ def initialize_app() -> dash.Dash:
         __name__,
         external_stylesheets=[
             'https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css'
-        ]
+        ],
+        suppress_callback_exceptions=True
     )
     
     # Set up layout
