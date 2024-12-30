@@ -6,12 +6,14 @@ class Navbar:
     def __init__(self):
         self.layout = html.Nav(
             html.Div([
-                html.H1("Natural Disasters Analysis 1970-2024", 
+                html.H1("Natural Disasters Analysis", 
                        className="text-xl font-bold text-white"),
                 html.Div([
-                    html.A("Dashboard", href="#", 
+                    html.A("Map", href="/map", id="nav-map",
                           className="text-white hover:text-gray-300 px-3 py-2"),
-                    html.A("About", href="#", 
+                    html.A("Time Analysis", href="/time", id="nav-time",
+                          className="text-white hover:text-gray-300 px-3 py-2"),
+                    html.A("About", href="/about", id="nav-about",
                           className="text-white hover:text-gray-300 px-3 py-2")
                 ], className="flex items-center space-x-4")
             ], className="container mx-auto px-4 flex justify-between items-center h-full"),

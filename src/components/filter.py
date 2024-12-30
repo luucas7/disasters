@@ -8,11 +8,11 @@ class Filter:
         self.data = data
         self.layout = html.Div([
             html.Div([
-                html.H2("Filtres", className="text-lg font-semibold mb-4"),
+                html.H2("Filters", className="text-lg font-semibold mb-4"),
                 
                 # Year filter
                 html.Div([
-                    html.Label("Année", className="block text-sm font-medium text-gray-700"),
+                    html.Label("Year", className="block text-sm font-medium text-gray-700"),
                     dcc.Dropdown(
                         id='year-filter',
                         options=self._get_year_options() if self.data is not None else [],
