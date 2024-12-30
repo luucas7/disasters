@@ -11,5 +11,5 @@ class Map:
                 id='main-map',
                 style={'height': 'calc(100vh - 64px)', 'width': '100%'},
                 config={ 'displayModeBar': False }
-            )
-        ])
+            ),
+        ], className="flex-1 ml-16 mt-16")

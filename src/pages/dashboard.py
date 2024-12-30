@@ -1,11 +1,13 @@
 from dash import html, dcc
 from dash.dependencies import Input, Output
 from typing import Any, Dict
+import numpy as np
 
 from src.components.navbar import Navbar
 from src.components.filter import Filter
 from src.components.main_content import MainContent
 from src.components.time_visualization import TimeVisualization
+
 
 def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
     """
@@ -27,7 +29,8 @@ def init_callbacks(app: Any, data: Any, geojson: Dict[str, Any]) -> None:
     
     # Set suppress_callback_exceptions to True
     app.config.suppress_callback_exceptions = True
-    
+    # éviter les erreurs lorsque Dash ne peut pas initialement trouver tous les composants d'un callback. nécessaire avec un système de routage car certains composants n'existent que dans certaines pages/
+
     @app.callback(
         Output('page-content', 'children'),
         [Input('url', 'pathname')]
@@ -70,6 +73,7 @@ def init_callbacks(app: Any, data: Any, geojson: Dict[str, Any]) -> None:
             
         # Compter le nombre de catastrophes par pays
         counts_by_country = filtered_data.groupby('Country').size().reset_index(name='Disaster_Count')
+        counts_by_country['Scaled_Count'] = np.log10(counts_by_country['Disaster_Count'] + 1)  # +1 pour éviter log(0)
             
         return {
             'data': [{
@@ -77,8 +81,8 @@ def init_callbacks(app: Any, data: Any, geojson: Dict[str, Any]) -> None:
                 'geojson': geojson,
                 'locations': counts_by_country['Country'],
                 'z': counts_by_country['Disaster_Count'],
-                'featureidkey': "properties.ADMIN",
-                'colorscale': "Viridis",
+                'featureidkey': "properties.ADMIN", # Custom selon le fichier geojson
+                'colorscale': "Jet",
                 'marker': {
                     'opacity': 0.5,
                     'line': {'width': 0}
