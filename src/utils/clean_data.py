@@ -33,6 +33,259 @@ class EMDATCleaner:
         'Appeal',
         'Declaration'
     ]
+    
+    COUNTRIES_MAPPING = {
+        'Iran (Islamic Republic of)' : 'Iran',
+        'United States' : 'United States of America',
+        'Venezuela (Bolivarian Republic of)' : 'Venezuela',
+        'China, Hong Kong Special Administrative Region' : 'China',
+        'Taiwan (Province of China)' : 'Taiwan',
+        'State of Palestine' : 'Palestine',
+        'Serbia Montenegro' : 'Serbia',
+        'Czechia' : 'Czech Republic',
+         'Syrian Arab Republic': 'Syria',
+        'Türkiye': 'Turkey',
+        'Democratic People\'s Republic of Korea': 'North Korea', 
+        'Republic of Korea': 'South Korea',
+        'Viet Nam': 'Vietnam',
+        'Lao People\'s Democratic Republic': 'Laos',
+        'Bolivia (Plurinational State of)': 'Bolivia'
+    }
+    
+    ISO_TO_COUNTRY = {
+        'AFG': 'Afghanistan',
+        'ALB': 'Albania',
+        'DZA': 'Algeria',
+        'AGO': 'Angola',
+        'ARG': 'Argentina',
+        'ARM': 'Armenia',
+        'AUS': 'Australia',
+        'AUT': 'Austria',
+        'AZE': 'Azerbaijan',
+        'BHS': 'Bahamas',
+        'BGD': 'Bangladesh',
+        'BRB': 'Barbados',
+        'BLR': 'Belarus',
+        'BEL': 'Belgium',
+        'BLZ': 'Belize',
+        'BEN': 'Benin',
+        'BTN': 'Bhutan',
+        'BOL': 'Bolivia',
+        'BIH': 'Bosnia and Herzegovina',
+        'BWA': 'Botswana',
+        'BRA': 'Brazil',
+        'BRN': 'Brunei',
+        'BGR': 'Bulgaria',
+        'BFA': 'Burkina Faso',
+        'BDI': 'Burundi',
+        'KHM': 'Cambodia',
+        'CMR': 'Cameroon',
+        'CAN': 'Canada',
+        'CPV': 'Cape Verde',
+        'CAF': 'Central African Republic',
+        'TCD': 'Chad',
+        'CHL': 'Chile',
+        'CHN': 'China',
+        'COL': 'Colombia',
+        'COM': 'Comoros',
+        'COG': 'Congo',
+        'CRI': 'Costa Rica',
+        'CIV': 'Ivory Coast',
+        'HRV': 'Croatia',
+        'CUB': 'Cuba',
+        'CYP': 'Cyprus',
+        'CZE': 'Czech Republic',
+        'COD': 'Democratic Republic of the Congo',
+        'DNK': 'Denmark',
+        'DJI': 'Djibouti',
+        'DOM': 'Dominican Republic',
+        'ECU': 'Ecuador',
+        'EGY': 'Egypt',
+        'SLV': 'El Salvador',
+        'GNQ': 'Equatorial Guinea',
+        'ERI': 'Eritrea',
+        'EST': 'Estonia',
+        'ETH': 'Ethiopia',
+        'FJI': 'Fiji',
+        'FIN': 'Finland',
+        'FRA': 'France',
+        'GAB': 'Gabon',
+        'GMB': 'Gambia',
+        'GEO': 'Georgia',
+        'DEU': 'Germany',
+        'GHA': 'Ghana',
+        'GRC': 'Greece',
+        'GTM': 'Guatemala',
+        'GIN': 'Guinea',
+        'GNB': 'Guinea-Bissau',
+        'GUY': 'Guyana',
+        'HTI': 'Haiti',
+        'HND': 'Honduras',
+        'HUN': 'Hungary',
+        'ISL': 'Iceland',
+        'IND': 'India',
+        'IDN': 'Indonesia',
+        'IRN': 'Iran',
+        'IRQ': 'Iraq',
+        'IRL': 'Ireland',
+        'ISR': 'Israel',
+        'ITA': 'Italy',
+        'JAM': 'Jamaica',
+        'JPN': 'Japan',
+        'JOR': 'Jordan',
+        'KAZ': 'Kazakhstan',
+        'KEN': 'Kenya',
+        'KIR': 'Kiribati',
+        'PRK': 'North Korea',
+        'KOR': 'South Korea',
+        'KWT': 'Kuwait',
+        'KGZ': 'Kyrgyzstan',
+        'LAO': 'Laos',
+        'LVA': 'Latvia',
+        'LBN': 'Lebanon',
+        'LSO': 'Lesotho',
+        'LBR': 'Liberia',
+        'LBY': 'Libya',
+        'LTU': 'Lithuania',
+        'LUX': 'Luxembourg',
+        'MKD': 'North Macedonia',
+        'MDG': 'Madagascar',
+        'MWI': 'Malawi',
+        'MYS': 'Malaysia',
+        'MDV': 'Maldives',
+        'MLI': 'Mali',
+        'MLT': 'Malta',
+        'MRT': 'Mauritania',
+        'MUS': 'Mauritius',
+        'MEX': 'Mexico',
+        'MDA': 'Moldova',
+        'MNG': 'Mongolia',
+        'MNE': 'Montenegro',
+        'MAR': 'Morocco',
+        'MOZ': 'Mozambique',
+        'MMR': 'Myanmar',
+        'NAM': 'Namibia',
+        'NPL': 'Nepal',
+        'NLD': 'Netherlands',
+        'NZL': 'New Zealand',
+        'NIC': 'Nicaragua',
+        'NER': 'Niger',
+        'NGA': 'Nigeria',
+        'NOR': 'Norway',
+        'OMN': 'Oman',
+        'PAK': 'Pakistan',
+        'PSE': 'Palestine',
+        'PAN': 'Panama',
+        'PNG': 'Papua New Guinea',
+        'PRY': 'Paraguay',
+        'PER': 'Peru',
+        'PHL': 'Philippines',
+        'POL': 'Poland',
+        'PRT': 'Portugal',
+        'QAT': 'Qatar',
+        'ROU': 'Romania',
+        'RUS': 'Russia',
+        'RWA': 'Rwanda',
+        'WSM': 'Samoa',
+        'SAU': 'Saudi Arabia',
+        'SEN': 'Senegal',
+        'SRB': 'Serbia',
+        'SLE': 'Sierra Leone',
+        'SGP': 'Singapore',
+        'SVK': 'Slovakia',
+        'SVN': 'Slovenia',
+        'SLB': 'Solomon Islands',
+        'SOM': 'Somalia',
+        'ZAF': 'South Africa',
+        'SSD': 'South Sudan',
+        'ESP': 'Spain',
+        'LKA': 'Sri Lanka',
+        'SDN': 'Sudan',
+        'SUR': 'Suriname',
+        'SWZ': 'Eswatini',
+        'SWE': 'Sweden',
+        'CHE': 'Switzerland',
+        'SYR': 'Syria',
+        'TWN': 'Taiwan',
+        'TJK': 'Tajikistan',
+        'TZA': 'Tanzania',
+        'THA': 'Thailand',
+        'TLS': 'Timor-Leste',
+        'TGO': 'Togo',
+        'TON': 'Tonga',
+        'TTO': 'Trinidad and Tobago',
+        'TUN': 'Tunisia',
+        'TUR': 'Turkey',
+        'TKM': 'Turkmenistan',
+        'UGA': 'Uganda',
+        'UKR': 'Ukraine',
+        'ARE': 'United Arab Emirates',
+        'GBR': 'United Kingdom',
+        'USA': 'United States of America',
+        'URY': 'Uruguay',
+        'UZB': 'Uzbekistan',
+        'VUT': 'Vanuatu',
+        'VEN': 'Venezuela',
+        'VNM': 'Vietnam',
+        'YEM': 'Yemen',
+        'ZMB': 'Zambia',
+        'ZWE': 'Zimbabwe',
+        'REU': 'Reunion',
+        'TUV': 'Tuvalu',
+        'SCG': 'Serbia and Montenegro',  # Ancien pays, maintenant séparé
+        'BMU': 'Bermuda',
+        'GUF': 'French Guiana',
+        'FSM': 'Micronesia',
+        'HKG': 'Hong Kong',
+        'BHR': 'Bahrain',
+        'MHL': 'Marshall Islands',
+        'PRI': 'Puerto Rico',
+        'ANT': 'Netherlands Antilles',  # Ancien territoire
+        'GLP': 'Guadeloupe',
+        'SHN': 'Saint Helena',
+        'CYM': 'Cayman Islands',
+        'SPI': 'Spratly Islands',
+        'COK': 'Cook Islands',
+        'GUM': 'Guam',
+        'SYC': 'Seychelles',
+        'GRD': 'Grenada',
+        'VCT': 'Saint Vincent and the Grenadines',
+        'MNP': 'Northern Mariana Islands',
+        'NCL': 'New Caledonia',
+        'ASM': 'American Samoa',
+        'NIU': 'Niue',
+        'TCA': 'Turks and Caicos Islands',
+        'LCA': 'Saint Lucia',
+        'VIR': 'U.S. Virgin Islands',
+        'DMA': 'Dominica',
+        'TKL': 'Tokelau',
+        'STP': 'Sao Tome and Principe',
+        'MSR': 'Montserrat',
+        'PYF': 'French Polynesia',
+        'MTQ': 'Martinique',
+        'MAC': 'Macao',
+        'MYT': 'Mayotte',
+        'ATG': 'Antigua and Barbuda',
+        'KNA': 'Saint Kitts and Nevis',
+        'WLF': 'Wallis and Futuna',
+        'PLW': 'Palau',
+        'AIA': 'Anguilla',
+        'BLM': 'Saint Barthelemy',
+        'MAF': 'Saint Martin',
+        'SXM': 'Sint Maarten',
+        'VGB': 'British Virgin Islands',
+        'CUW': 'Curacao',
+        'IMN': 'Isle of Man',
+        'LIE': 'Liechtenstein'
+    }
+
+
+    
+    REGIONS_MAPPING = {
+        'Americas': 'America',
+    }
+        
+            
 
     def __init__(self, df: pd.DataFrame):
         """Initialize with a DataFrame."""
@@ -97,6 +350,21 @@ class EMDATCleaner:
         self.df['ADM2_Count'] = self.df['ADM2_Units'].str.len()
         
         return self
+    
+    
+    def normalize_country_names(self) -> 'EMDATCleaner':
+        """Normalize country names using ISO codes and country mapping."""
+        if 'ISO' in self.df.columns:
+            # Utiliser le code ISO pour déterminer le nom du pays
+            self.df['Country'] = self.df['ISO'].map(self.ISO_TO_COUNTRY)
+            
+            # Log des codes ISO qui n'ont pas de correspondance
+            missing_iso = self.df[self.df['Country'].isna()]['ISO'].unique()
+            if len(missing_iso) > 0:
+                logger.warning(f"Missing ISO code mappings for: {missing_iso}")
+        
+        return self
+    
 
     def clean_dates(self) -> 'EMDATCleaner':
         """Clean and standardize date fields."""
@@ -188,12 +456,11 @@ class EMDATCleaner:
          .clean_monetary_values()
          .clean_impact_values()
          .clean_geographic_data()
+         .normalize_country_names()
         )
-        
-        logger.info("Completed EMDAT data cleaning process")
         return self.df
 
-def process_and_clean_data(input_df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+def process_and_clean_data(input_df: pd.DataFrame) -> pd.DataFrame:
     """
     Main function to process and clean EMDAT disaster data.
     
@@ -201,16 +468,8 @@ def process_and_clean_data(input_df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[s
         input_df: Raw DataFrame from EMDAT Excel file
         
     Returns:
-        Tuple containing:
-        - Cleaned DataFrame (or None if error)
-        - Dictionary with processing results and statistics
+        Cleaned DataFrame (or None if error)
     """
-    results: Dict[str, Any] = {
-        'success': False,
-        'error': None,
-        'statistics': {},
-        'missing_columns': []
-    }
     
     try:
         # Initial data validation
@@ -223,28 +482,8 @@ def process_and_clean_data(input_df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[s
         # Clean data using EMDATCleaner
         cleaned_df = EMDATCleaner(input_df).process()
         
-        # Calculate statistics
-        results['statistics'] = {
-            'initial_records': initial_shape[0],
-            'final_records': len(cleaned_df),
-            'missing_values_pct': cleaned_df.isna().sum().to_dict(),
-            'has_coordinates_pct': (
-                (cleaned_df['Has_Coordinates'].mean() * 100)
-                if 'Has_Coordinates' in cleaned_df.columns
-                else 0
-            )
-        }
-        
-        # Add disaster type distribution
-        if 'Disaster Type' in cleaned_df.columns:
-            results['statistics']['disaster_type_counts'] = (
-                cleaned_df['Disaster Type'].value_counts().to_dict()
-            )
-        
-        results['success'] = True
-        return cleaned_df, results
+        return cleaned_df
         
     except Exception as e:
         logger.error(f"Error in data cleaning process: {str(e)}")
-        results['error'] = str(e)
-        return None, results
+        return None

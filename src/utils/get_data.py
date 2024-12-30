@@ -1,3 +1,4 @@
+import json
 from typing import Optional, Dict, Any
 from pathlib import Path
 import pandas as pd
@@ -70,6 +71,13 @@ def process_data(data_path: Path) -> Dict[str, Any]:
         for path in [raw_path, clean_path, geo_path]:
             path.mkdir(parents=True, exist_ok=True)
         
+        if (clean_path / "cleaned_disasters.csv").exists():
+            df = pd.read_csv(clean_path / "cleaned_disasters.csv")
+            return {
+                "success": True,
+                "data": df
+            }
+        
         # Read raw data
         raw_df = read_raw_disaster_data(raw_path)
         if raw_df is None:
@@ -80,37 +88,28 @@ def process_data(data_path: Path) -> Dict[str, Any]:
         convert_to_csv(raw_path / RAW_DISASTER_DATA_FILE, csv_path)
         
         # Clean data first
-        logger.info("Starting data cleaning")
-        cleaned_df, cleaning_results = process_and_clean_data(raw_df)
+        cleaned_df = process_and_clean_data(raw_df)
         
 
         # Save intermediate cleaned data
-        interim_path = clean_path / "cleaned_disasters_no_coords.csv"
+        interim_path = clean_path / "cleaned_disasters.csv"
         if cleaned_df is not None:
             cleaned_df.to_csv(interim_path, index=False)
         
         # Process geolocation on cleaned data
-        logger.info("Starting geolocation processing")
+        #logger.info("Starting geolocation processing")
         #geo_processor = GeolocationProcessor(geo_path)
         #final_df = geo_processor.ProcessGeolocation(cleaned_df)
         final_df = cleaned_df.copy()
         
         # Save final data with coordinates
-        output_path = clean_path / "cleaned_disasters_with_coords.csv"
-        final_df.to_csv(output_path, index=False)
-        logger.info(f"Saved final data to {output_path}")
-        
-        # Save processing summary
-        stats = cleaning_results['statistics']
-        stats.update({
-            'input_records': len(raw_df),
-            'cleaned_records': len(cleaned_df),
-            'geo_mapped_records': final_df[['Latitude', 'Longitude']].notna().all(axis=1).sum()
-        })
+        #output_path = clean_path / "cleaned_disasters_with_coords.csv"
+        #final_df.to_csv(output_path, index=False)
+        #logger.info(f"Saved final data to {output_path}")
         
         return {
             "success": True,
-            "statistics": stats,
+            "data" : final_df
         }
         
     except Exception as e:
@@ -119,3 +118,26 @@ def process_data(data_path: Path) -> Dict[str, Any]:
             "success": False, 
             "error": str(e)
         }
+        
+        
+def load_countries_geojson(geo_path: Path) -> Dict[str, Any]:
+    """
+    Load the countries GeoJSON data.
+    
+    Args:
+        geo_path: Path to the GeoJSON file
+    """
+    try:
+        geojson_path = geo_path / "countries.geojson"
+        
+        with open(geojson_path, 'r') as f:
+            geojson = json.load(f)
+        
+        return geojson
+        
+    except FileNotFoundError:
+        logger.error(f"GeoJSON file not found in {geo_path}")
+        return None
+    except Exception as e:
+        logger.error(f"Error reading GeoJSON file: {e}")
+        return None

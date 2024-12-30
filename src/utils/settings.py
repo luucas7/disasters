@@ -13,7 +13,7 @@ def get_project_paths() -> Dict[str, Path]:
         'data' : project_root / 'data',
         'raw': project_root / 'data' / 'raw',
         'clean': project_root / 'data' / 'clean',
-        'geo_mapping': project_root / 'data' / 'raw' / 'geo_mapping',
+        'geo_mapping': project_root / 'data' / 'geo_mapping',
         'components': project_root / 'src' / 'components',
         'pages': project_root / 'src' / 'pages',
         'utils': project_root / 'src' / 'utils'
