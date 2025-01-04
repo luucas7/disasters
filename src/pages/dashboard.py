@@ -5,143 +5,94 @@ import numpy as np
 
 from src.components.navbar import Navbar
 from src.components.filter import Filter
-from src.components.main_content import MainContent
+from src.components.card import Card
+from src.components.map import Map
 from src.components.time_visualization import TimeVisualization
 
+from src.graphics.map import register_callbacks as map_callbacks
+from src.graphics.timed_count import register_callbacks as time_callbacks
 
 def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
-    """
-    Create the main dashboard layout.
-
-    Args:
-        data: DataFrame containing the disaster data
-        geojson: GeoJSON data for the map
-    """
-    return html.Div(
-        [
-            dcc.Location(id="url", refresh=False),
-            Navbar()(),
-            html.Div(id="page-content", className="flex h-screen"),
-            dcc.Store(id="current-view", data="map"),
-        ]
-    )
+    """Create the main dashboard layout."""
+    
+    # Get min/max years for global filters
+    min_year = int(data["Start Year"].min()) if data is not None else None
+    max_year = int(data["Start Year"].max()) if data is not None else None
+    
+    # Create filter instances for each visualization
+    map_filters = Filter(data, "map")
+    time_filters = Filter(data, "time")
+    
+    return html.Div([
+        # Navigation
+        Navbar()(),
+        
+        # Global filters row
+        html.Div([
+            html.Div([
+                html.Label("Start Year"),
+                dcc.Dropdown(
+                    id="start-year-filter",
+                    options=map_filters._get_year_options(),
+                    value=min_year
+                )
+            ], className="w-1/4"),
+            html.Div([
+                html.Label("End Year"),
+                dcc.Dropdown(
+                    id="end-year-filter",
+                    options=map_filters._get_year_options(),
+                    value=max_year
+                )
+            ], className="w-1/4"),
+        ], className="flex gap-4 p-4 fixed w-full top-16 bg-white z-40 shadow-sm"),
+        
+        # Main content grid
+        html.Div([
+            # Map section
+            html.Div([
+                Card(
+                    title="Geographic Distribution",
+                    filters=[
+                        html.Div([
+                            html.Label("Disaster Type"),
+                            dcc.Dropdown(id="disaster-type-filter")
+                        ], className="w-1/2"),
+                        html.Div([
+                            html.Label("Region"),
+                            dcc.Dropdown(id="region-filter")
+                        ], className="w-1/2"),
+                    ]
+                )(Map(data, geojson).layout)
+            ], className="w-3/4"),
+            
+            # Side panel
+            html.Div([
+                # Time series
+                Card(
+                    title="Temporal Analysis",
+                    filters=[
+                        html.Div([
+                            html.Label("Group By"),
+                            dcc.Dropdown(id="group-by-filter")
+                        ]),
+                        html.Div([
+                            html.Label("Impact Metric"),
+                            dcc.Dropdown(id="impact-metric-filter")
+                        ])
+                    ]
+                )(TimeVisualization(data).layout)
+            ], className="w-1/4")
+            
+        ], className="flex gap-4 p-4 mt-24 bg-gray-100 min-h-screen")
+    ])
 
 
 def init_callbacks(app: Any, data: Any, geojson: Dict[str, Any]) -> None:
     """Initialize dashboard callbacks."""
-
-    # Set suppress_callback_exceptions to True
+    
     app.config.suppress_callback_exceptions = True
-    # éviter les erreurs lorsque Dash ne peut pas initialement trouver tous les composants d'un callback. nécessaire avec un système de routage car certains composants n'existent que dans certaines pages/
 
-    @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
-    def display_page(pathname):
-        view_type = (
-            "map" if pathname == "/map" else "time" if pathname == "/time" else "about"
-        )
+    map_callbacks(app, data, geojson)
+    time_callbacks(app, data)
 
-        # Create components
-        filter_component = Filter(data, view_type)
-        main_content = MainContent(data, geojson, view_type)
-
-        # Return their layouts directly
-        return [filter_component.layout, main_content.layout]
-
-    @app.callback(
-        Output("main-map", "figure"),
-        [
-            Input("start-year-filter", "value"),
-            Input("end-year-filter", "value"),
-            Input("disaster-type-filter", "value"),
-            Input("region-filter", "value"),
-        ],
-    )
-    def update_map(
-        start_year: int, end_year: int, disaster_type: str, region: str
-    ) -> Dict[str, Any]:
-        filtered_data = data.copy()
-
-        # Use min/max values if no year is selected
-        start_year = (
-            start_year if start_year is not None else int(data["Start Year"].min())
-        )
-        end_year = end_year if end_year is not None else int(data["Start Year"].max())
-
-        # Apply filters
-        if disaster_type and disaster_type != "All":
-            filtered_data = filtered_data[
-                filtered_data["Disaster Type"] == disaster_type
-            ]
-
-        if region and region != "All":
-            filtered_data = filtered_data[filtered_data["Region"] == region]
-
-        # Filter by start and end year
-        filtered_data = filtered_data[
-            (filtered_data["Start Year"] >= start_year)
-            & (filtered_data["Start Year"] <= end_year)
-        ]
-
-        # Count number of disasters by country
-        counts_by_country = (
-            filtered_data.groupby("Country").size().reset_index(name="Disaster_Count")
-        )
-
-        # Use log scale for better color distribution
-        counts_by_country["Scaled_Count"] = np.log10(
-            counts_by_country["Disaster_Count"] + 1
-        )
-
-        return {
-            "data": [
-                {
-                    "type": "choroplethmapbox",
-                    "geojson": geojson,
-                    "locations": counts_by_country["Country"],
-                    "z": counts_by_country["Scaled_Count"],
-                    "featureidkey": "properties.ADMIN",  # GeoJSON property to use as feature identifier
-                    "marker": {"opacity": 0.5, "line": {"width": 0}},
-                    "colorscale": "Viridis",
-                    "hovertemplate": "<b>%{location}</b><br>"
-                    + "Disaster count: %{customdata}<br>"
-                    + "<extra></extra>",
-                    "customdata": counts_by_country["Disaster_Count"],
-                }
-            ],
-            "layout": {
-                "mapbox": {
-                    "style": "carto-positron",
-                    "zoom": 1,
-                    "center": {"lat": 20, "lon": 0},
-                },
-                "margin": {"r": 0, "t": 0, "l": 0, "b": 0},
-                "autosize": True,
-            },
-        }
-
-    @app.callback(
-        Output("time-series-chart", "figure"),
-        [
-            Input("start-year-filter", "value"),
-            Input("end-year-filter", "value"),
-            Input("group-by-filter", "value"),
-            Input("impact-metric-filter", "value"),
-        ],
-    )
-    def update_time_series(
-        start_year: int, end_year: int, group_by: str, metric: str
-    ) -> Dict[str, Any]:
-        # Use min/max values if no year is selected
-        start_year = (
-            start_year if start_year is not None else int(data["Start Year"].min())
-        )
-        end_year = end_year if end_year is not None else int(data["Start Year"].max())
-
-        # Filter data by year range
-        filtered_data = data[
-            (data["Start Year"] >= start_year) & (data["Start Year"] <= end_year)
-        ].copy()
-
-        # Create visualization
-        time_viz = TimeVisualization(filtered_data)
-        return time_viz.create_figure(group_by, metric)

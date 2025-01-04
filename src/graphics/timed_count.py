@@ -1,0 +1,85 @@
+from dash import html, dcc
+import plotly.graph_objects as go
+from typing import Any, Dict
+
+class TimedCount:
+    """Time series visualization component."""
+    
+    def __init__(self, data=None):
+        self.data = data
+        self.layout = html.Div([
+            dcc.Graph(
+                id='time-series-chart',
+                style={'height': '80vh', 'width': '95%'},
+                config={ 'displayModeBar': False },
+
+            )
+        ], className="flex-1 ml-16 mt-16")
+
+    def create_figure(self, group_by: str = 'Region', metric: str = 'count') -> Dict:
+        """
+        Create the time series histogram.
+        
+        Args:
+            group_by: Column to group by ('Region', 'Disaster Type', or 'Subregion')
+            metric: Impact metric (variable) to display ('count', 'Total Damage', etc.)
+        """
+        if self.data is None:
+            return {}
+            
+        # Group data by year and group_by column
+        if metric == 'count':
+            grouped = (self.data.groupby(['Start Year', group_by])
+                      .size()
+                      .reset_index(name='Count'))
+            y_title = 'Number of disasters'
+        else:
+            grouped = (self.data.groupby(['Start Year', group_by])
+                      [metric]
+                      .sum()
+                      .reset_index())
+            y_title = metric
+
+        # Create figure
+        fig = go.Figure()
+        
+        # Add traces for each category
+        for category in sorted(grouped[group_by].unique()):
+            df_filtered = grouped[grouped[group_by] == category]
+            
+            fig.add_trace(go.Bar(
+                name=category,
+                x=df_filtered['Start Year'],
+                y=df_filtered['Count'] if metric == 'count' else df_filtered[metric],
+                hovertemplate=(
+                    f"{group_by}: {category}<br>" +
+                    "Year: %{x}<br>" +
+                    f"{y_title}: %{{y:,.0f}}<br>" +
+                    "<extra></extra>"
+                )
+            ))
+            
+        # Update layout
+        fig.update_layout(
+        title=f"{y_title} by {(group_by).lower()} over time",
+        xaxis_title="Year",
+        yaxis_title=y_title,
+        barmode='stack',
+        showlegend=True,
+        legend=dict(
+            yanchor="top",
+            y=1,
+            xanchor="left",
+            x=1.02,  # Position horizontale (>1 pour placer à droite)
+            bgcolor="white",  # Fond blanc
+            bordercolor="gray",  # Bordure grise
+            borderwidth=1
+        ),
+        margin=dict(l=50, r=100, t=30, b=30),
+        hovermode='closest'
+    )
+        
+        return fig
+
+    def __call__(self):
+        return self.layout 
