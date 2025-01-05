@@ -16,9 +16,9 @@ class Card:
                 html.Div(
                     [
                         html.H3(self.title, className="text-lg font-semibold"),
-                        html.Div(self.filters, className="flex gap-4 mt-4") if self.filters else None,
+                        html.Div(self.filters, className="flex flex-wrap gap-4 mt-4") if self.filters else None,
                     ],
-                    className="p-4 border-b",
+                    className="p-3 border-b",
                 )
                 if self.title or self.filters
                 else None,
