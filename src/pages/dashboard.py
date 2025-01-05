@@ -38,7 +38,7 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
                             title="Geographic Distribution",
                             filters=[disaster_filter, region_filter]
                         )(Map(data, geojson)())
-                    ], className="w-2/3"),  # 2/3 de la largeur
+                    ], className="w-2/3"), 
                     
                     # Pie chart container
                     html.Div([
@@ -47,7 +47,7 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
                         )(DisasterPieChart(data)())
                     ], className="w-1/3"), 
                     
-                ], className="flex gap-4"),  # Flex pour les mettre côte à côte
+                ], className="flex gap-4"),  
             ], className="w-full"),
             
 

@@ -4,7 +4,6 @@ from pathlib import Path
 import pandas as pd
 from pandas import DataFrame
 from . import logger
-from .geolocation_processor import GeolocationProcessor
 from .clean_data import process_and_clean_data
 
 RAW_DISASTER_DATA_FILE = "public_emdat_custom_request_2024-12-26_cde276d8-746c-45c1-8c28-51e1fef813a6.xlsx"
@@ -91,22 +90,11 @@ def process_data(data_path: Path) -> Dict[str, Any]:
         cleaned_df = process_and_clean_data(raw_df)
         
 
-        # Save intermediate cleaned data
-        interim_path = clean_path / "cleaned_disasters.csv"
+        # Save cleaned data
+        final_df = clean_path / "cleaned_disasters.csv"
         if cleaned_df is not None:
-            cleaned_df.to_csv(interim_path, index=False)
-        
-        # Process geolocation on cleaned data
-        #logger.info("Starting geolocation processing")
-        #geo_processor = GeolocationProcessor(geo_path)
-        #final_df = geo_processor.ProcessGeolocation(cleaned_df)
-        final_df = cleaned_df.copy()
-        
-        # Save final data with coordinates
-        #output_path = clean_path / "cleaned_disasters_with_coords.csv"
-        #final_df.to_csv(output_path, index=False)
-        #logger.info(f"Saved final data to {output_path}")
-        
+            cleaned_df.to_csv(final_df, index=False)
+                
         return {
             "success": True,
             "data" : final_df

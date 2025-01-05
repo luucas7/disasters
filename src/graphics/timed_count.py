@@ -72,9 +72,9 @@ class TimedCount:
             yanchor="top",
             y=1,
             xanchor="left",
-            x=1.02,  # Position horizontale (>1 pour placer à droite)
-            bgcolor="white",  # Fond blanc
-            bordercolor="gray",  # Bordure grise
+            x=1.02,  
+            bgcolor="white",  
+            bordercolor="gray",
             borderwidth=1
         ),
         margin=dict(l=50, r=100, t=30, b=30),
