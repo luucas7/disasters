@@ -34,7 +34,7 @@ class Map:
             autosize=True
         )
         
-        return html.Div(dcc.Graph(figure=fig,id="map"), style={'width': '100%', 'height': '500px'})
+        return html.Div(dcc.Graph(figure=fig,id="map",config={                     'doubleClick': 'reset+autosize','scrollZoom': True,'displayModeBar': False }), style={'width': '100%', 'height': '500px'})
 
 def register_map_callbacks(app, data, geojson):
     @app.callback(
@@ -85,6 +85,7 @@ def register_map_callbacks(app, data, geojson):
         fig.update_layout(
             mapbox_style="carto-positron",
             mapbox_zoom=1,
+            
             mapbox_center={"lat": 20, "lon": 0},
             margin={"r": 0, "t": 0, "l": 0, "b": 0},
             autosize=True

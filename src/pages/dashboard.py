@@ -49,11 +49,10 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
                 )(TimedCount(data)())
             ], className="flex-1 flex flex-col gap-4"),
             
-            
             # Right column - Secondary visualizations and stats
             html.Div([
                 # Database stats card
-                Card(title="Overall Statistics", className="max-h-[200px]")(
+                Card(title="Database Statistics")(
                     html.Div([
                         html.P(f"Total number of recorded disasters: {len(data):,}", 
                               className="text-xl font-semibold text-blue-600"),
