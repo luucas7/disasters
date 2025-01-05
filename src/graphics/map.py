@@ -34,7 +34,11 @@ class Map:
             autosize=True
         )
         
-        return html.Div(dcc.Graph(figure=fig,id="map",config={                     'doubleClick': 'reset+autosize','scrollZoom': True,'displayModeBar': False }), style={'width': '100%', 'height': '500px'})
+        return html.Div(dcc.Graph(figure=fig, id="map", config={
+            'doubleClick': 'reset+autosize',
+            'scrollZoom': True,
+            'displayModeBar': True
+        }), style={'width': '100%', 'height': '500px'})
 
 def register_map_callbacks(app, data, geojson):
     @app.callback(

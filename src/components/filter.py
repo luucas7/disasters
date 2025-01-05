@@ -12,19 +12,20 @@ class Filter:
         return html.Div([
             html.Label(
                 label,
-                className="block text-base font-medium text-gray-700 mb-2"
+                className="block text-base font-medium text-sage-700 mb-2"
             ),
             dcc.Dropdown(
                 id=id,
                 options=options,
                 value=value,
-                className="text-base",
+                className="rounded-md border-sage-200 focus:border-sage-500 focus:ring-sage-500",
                 style={
                     'min-width': '230px'
-                }
+                },
+                placeholder=f"Select {label.lower()}..."
             ),
-        ], className="mb-6")
-
+        ], className="mb-6 relative group")  # group pour interactions
+    
     def disaster_filter(self):
         """Create a disaster type filter dropdown."""
         return self.dropdown_filter(

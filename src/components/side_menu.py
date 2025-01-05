@@ -14,6 +14,14 @@ class SideMenu:
         
         return html.Div([
             html.Div([
+
+                html.Div([
+                    html.H1("Global Disasters Watch", 
+                           className="text-xl font-bold "),
+                    html.P("Understanding disasters across time and space",
+                          className="text-sm mt-1")
+                ], className="flex flex-col bg-blue-800 text-white p-4"),
+
                 html.H2("Global Filters", className="text-lg font-semibold mb-4"),
                 
                 # Start Year filter
@@ -44,7 +52,7 @@ class SideMenu:
                     ),
                 ], className="mb-4"),
             ], className="p-4")
-        ], className="w-64 bg-white border-r border-gray-200 h-screen fixed left-0 overflow-y-auto")
+        ], className="w-64 bg-blue border-r border-gray-200 h-screen fixed left-0 overflow-y-auto")
     
     def _get_year_options(self):
         if self.data is not None:

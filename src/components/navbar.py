@@ -29,7 +29,7 @@ class Navbar:
                     target="_blank"),
                 ], className="flex items-center space-x-4")
             ], className="container px-4 flex justify-between items-center h-full"),
-            className="bg-blue-800 h-20 w-full z-[9999] top-0 left-0"  # Increased height for subtitle
+            className="bg-blue-800 h-20 w-full z-50 relative"  # Increased height for subtitle
         )
 
     def __call__(self):

@@ -2,28 +2,6 @@ import plotly.graph_objects as go
 from dash import html, dcc
 from dash.dependencies import Input, Output
 
-class DisasterPieChart:
-    def __init__(self, data=None):
-        self.data = data
-        self.layout = html.Div([            
-            
-            # Graph container
-            html.Div([
-                dcc.Graph(
-                    id='disaster-pie-chart',
-                    style={'height': '600px'}, 
-                    config={
-                        'displayModeBar': False,
-                        'displaylogo': False
-                    }
-                )
-            ], className="w-full p-4")
-        ], className="h-full flex flex-col")
-
-    def __call__(self):
-        return self.layout
-
-
 def group_similar_disasters(data, group=False):
     if not group:
         return data
@@ -43,10 +21,42 @@ def group_similar_disasters(data, group=False):
     
     return data_copy
   
-  
+class DisasterPieChart:
+    def __init__(self, data=None):
+        self.data = data
+        self.layout = html.Div([    
+            # Légende placeholder        
+            html.Div([
+                dcc.Graph(
+                    id='disaster-pie-legend',
+                    style={'height': '100px'},
+                    config={
+                        'displayModeBar': False,
+                        'displaylogo': False
+                    }
+                )
+            ], className="w-full mb-5"),
+            
+            # Graphique principal
+            html.Div([
+                dcc.Graph(
+                    id='disaster-pie-chart',
+                    style={'height': '350px'},
+                    config={
+                        'displayModeBar': False,
+                        'displaylogo': False
+                    }
+                )
+            ], className="w-full")
+        ], className="h-full flex flex-col")
+
+    def __call__(self):
+        return self.layout
+
 def register_pie_callbacks(app, data):
     @app.callback(
-        Output('disaster-pie-chart', 'figure'),
+        [Output('disaster-pie-chart', 'figure'),
+         Output('disaster-pie-legend', 'figure')],
         [Input('group-similar-disasters', 'value'),
          Input('start-year-filter', 'value'),
          Input('end-year-filter', 'value')]
@@ -65,35 +75,51 @@ def register_pie_callbacks(app, data):
         
         counts = filtered_data['Disaster Type'].value_counts()
         
-        return go.Figure(
+        # Figure principale avec pie chart sans légende
+        pie_fig = go.Figure(
             data=[go.Pie(
                 labels=counts.index,
                 values=counts.values,
-                textinfo='percent',
-                showlegend=True,
+                textinfo='none',
+                showlegend=False,
                 textposition='auto',
-                hole=0.4,  # Adds a donut hole
+                hole=0.4,
                 marker=dict(
-                    line=dict(color='white', width=2)  # Adds white borders between sections
+                    line=dict(color='white', width=2)
                 )
             )],
             layout=dict(
                 autosize=True,
-                height=500,
-                showlegend=True,
-                legend=dict(
-                    orientation="v",
-                    yanchor="middle",
-                    y=0.5,
-                    xanchor="right",
-                    x=1.1,
-                    font=dict(size=12),
-                    bgcolor='rgba(255, 255, 255, 0.8)',
-                    bordercolor='rgba(0, 0, 0, 0.1)',
-                    borderwidth=1
-                ),
-                margin=dict(r=150, t=30, l=30, b=30),
+                margin=dict(l=20, r=20, t=20, b=20),
                 paper_bgcolor='rgba(0,0,0,0)',
                 plot_bgcolor='rgba(0,0,0,0)',
             )
         )
+        
+        # Figure pour la légende uniquement
+        legend_fig = go.Figure(
+            data=[go.Pie(
+                labels=counts.index,
+                values=counts.values,
+                textinfo='none',
+                showlegend=True,
+                hole=1, # Rend le pie invisible
+            )],
+            layout=dict(
+                showlegend=True,
+                legend=dict(
+                    orientation="h",
+                    yanchor="middle",
+                    y=0.5,
+                    xanchor="center",
+                    x=0.5,
+                    font=dict(size=11),
+                ),
+                margin=dict(l=0, r=0, t=0, b=0),
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                height=100,
+            )
+        )
+
+        return pie_fig, legend_fig
