@@ -12,11 +12,11 @@ class TimedCount:
         self.layout = html.Div([
             dcc.Graph(
                 id='time-series-chart',
-                style={'height': '80vh', 'width': '95%'},
+                style={'width': '95%'},
                 config={ 'displayModeBar': False },
 
             )
-        ], className="flex-1 ml-16 mt-16")
+        ], className="flex-1 ml-16")
 
     def create_figure(self, group_by: str = 'Region', metric: str = 'count') -> Dict:
         """

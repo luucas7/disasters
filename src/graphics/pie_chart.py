@@ -2,33 +2,22 @@ import plotly.graph_objects as go
 from dash import html, dcc
 from dash.dependencies import Input, Output
 
-
 class DisasterPieChart:
     def __init__(self, data=None):
         self.data = data
-        self.layout = html.Div([
-          
-          # Filters 
-            html.Div([
-                dcc.Checklist(
-                    id='group-similar-disasters',
-                    options=[{'label': 'Group similar disasters', 'value': 'group'}],
-                    value=[],
-                    className="text-sm font-medium text-gray-700"
-                )
-            ], className="border-b"),
+        self.layout = html.Div([            
             
+            # Graph container
             html.Div([
                 dcc.Graph(
                     id='disaster-pie-chart',
                     style={'height': '600px'}, 
                     config={
                         'displayModeBar': False,
-                        'displaylogo': False,
-                        #'modeBarButtonsToRemove': ['zoom', 'pan', 'select', 'lasso2d']
+                        'displaylogo': False
                     }
                 )
-            ], className="w-full")
+            ], className="w-full p-4")
         ], className="h-full flex flex-col")
 
     def __call__(self):
@@ -47,7 +36,6 @@ def group_similar_disasters(data, group=False):
     }
     
     data_copy = data.copy()
-    # Replacing some value by their group
     for group_name, disasters in groups.items():
         mask = data_copy['Disaster Type'].isin(disasters)
         if mask.any(): 
@@ -57,7 +45,6 @@ def group_similar_disasters(data, group=False):
   
   
 def register_pie_callbacks(app, data):
-
     @app.callback(
         Output('disaster-pie-chart', 'figure'),
         [Input('group-similar-disasters', 'value'),
@@ -73,34 +60,40 @@ def register_pie_callbacks(app, data):
             (data['Start Year'] <= end_year)
         ]
         
-        # Grouping similar disasters if asked
-        if 'group' in group_similar:
+        if group_similar and 'group' in group_similar:
             filtered_data = group_similar_disasters(filtered_data, True)
         
         counts = filtered_data['Disaster Type'].value_counts()
         
         return go.Figure(
-          data=[go.Pie(
-              labels=counts.index,
-              values=counts.values,
-              textinfo='percent',
-              showlegend=True,
-              textposition='auto'
-          )],
-          
-          # Documentation : https://plotly.com/python/reference/layout/
-          layout=dict(
-              autosize=False,
-              height=500,
-              showlegend=True,
-              legend=dict(
-                  x=1.3,
-                  y=1,
-                  yanchor="top",  
-                  xanchor="left",
-                  orientation="v",  
-              ),
-              margin=dict(r=150, t=30, l=30, b=30),
-              font=dict(size=10),
-          )
-      )
+            data=[go.Pie(
+                labels=counts.index,
+                values=counts.values,
+                textinfo='percent',
+                showlegend=True,
+                textposition='auto',
+                hole=0.4,  # Adds a donut hole
+                marker=dict(
+                    line=dict(color='white', width=2)  # Adds white borders between sections
+                )
+            )],
+            layout=dict(
+                autosize=True,
+                height=500,
+                showlegend=True,
+                legend=dict(
+                    orientation="v",
+                    yanchor="middle",
+                    y=0.5,
+                    xanchor="right",
+                    x=1.1,
+                    font=dict(size=12),
+                    bgcolor='rgba(255, 255, 255, 0.8)',
+                    bordercolor='rgba(0, 0, 0, 0.1)',
+                    borderwidth=1
+                ),
+                margin=dict(r=150, t=30, l=30, b=30),
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+            )
+        )

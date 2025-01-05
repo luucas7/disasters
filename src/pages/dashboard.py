@@ -4,6 +4,7 @@ from typing import Any, Dict
 
 from src.components.navbar import Navbar
 from src.components.filter import Filter
+from src.components.checkbox import Checkbox
 from src.components.side_menu import SideMenu
 from src.components.card import Card
 
@@ -19,39 +20,58 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
     disaster_filter = filters.disaster_filter()
     region_filter = filters.region_filter()
     group_by_filter = filters.group_by_filter()
-    impact_metric_filter = filters.impact_metric_filter()                 
+    impact_metric_filter = filters.impact_metric_filter()           
+    
+    pie_chart_group_checkbox = Checkbox(
+        id="group-similar-disasters",
+        options=[{"label": "Group Similar Disasters", "value": "group"}],
+        value=["group"]
+    )()
     
     return html.Div([
         Navbar()(),
-        SideMenu()(),
+        SideMenu(data)(),
                 
         # Main content
         html.Div([
-            # Left side with Map and Pie Chart side by side
+            # Left column - Main visualizations
             html.Div([
-                # Container for Map and Pie side by side
-                html.Div([
-                    
-                    # Map container
-                    html.Div([
-                        Card(
-                            title="Geographic Distribution",
-                            filters=[disaster_filter, region_filter]
-                        )(Map(data, geojson)())
-                    ], className="w-2/3"), 
-                    
-                    # Pie chart container
-                    html.Div([
-                        Card(
-                            title="Disaster Type Distribution"
-                        )(DisasterPieChart(data)())
-                    ], className="w-1/3"), 
-                    
-                ], className="flex gap-4"),  
-            ], className="w-full"),
+                # Map
+                Card(
+                    title="Geographic Distribution",
+                    filters=[disaster_filter, region_filter]
+                )(Map(data, geojson)()),
+                
+                # Time series chart
+                Card(
+                    title="Temporal Evolution",
+                    filters=[group_by_filter, impact_metric_filter]
+                )(TimedCount(data)())
+            ], className="flex-1 flex flex-col gap-4"),
             
+            
+            # Right column - Secondary visualizations and stats
+            html.Div([
+                # Database stats card
+                Card(title="Overall Statistics", className="max-h-[200px]")(
+                    html.Div([
+                        html.P(f"Total number of recorded disasters: {len(data):,}", 
+                              className="text-xl font-semibold text-blue-600"),
+                        html.P(f"Date range: {int(data['Start Year'].min())} - {int(data['Start Year'].max())}",
+                              className="text-gray-600 mt-2"),
+                        html.P(f"Number of countries: {data['Country'].nunique():,}",
+                              className="text-gray-600"),
+                    ], className="p-4")
+                ),
+                
+                # Pie chart
+                Card(
+                    title="Disaster Type Distribution",
+                    filters=[pie_chart_group_checkbox]
+                )(DisasterPieChart(data)())
+            ], className="w-1/3 flex flex-col gap-4"),
 
-        ], className="flex gap-4 p-4 ml-64 mt-16 bg-gray-100")
+        ], className="flex gap-4 p-4 ml-64 mt-16 bg-gray-100 min-h-screen")
     ])
 
 def init_callbacks(app: Any, data: Any, geojson: Dict[str, Any]) -> None:
