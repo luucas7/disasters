@@ -37,7 +37,7 @@ class Map:
         return html.Div(dcc.Graph(figure=fig, id="map", config={
             'doubleClick': 'reset+autosize',
             'scrollZoom': True,
-            'displayModeBar': True
+            'displayModeBar': False
         }), style={'width': '100%', 'height': '500px'})
 
 def register_map_callbacks(app, data, geojson):

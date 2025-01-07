@@ -13,7 +13,8 @@ class TimedCount:
             dcc.Graph(
                 id='time-series-chart',
                 style={'width': '95%'},
-                config={ 'displayModeBar': True },
+                config={ 'displayModeBar': False,
+                 },
 
             )
         ], className="flex-1 ml-16")
