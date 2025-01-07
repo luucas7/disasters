@@ -54,7 +54,7 @@ def read_raw_disaster_data(file_path: Path) -> Optional[DataFrame]:
         logger.error(f"Error reading Excel file: {e}")
         return None
 
-def process_data(data_path: Path) -> Dict[str, Any]:
+def process_data(data_path: Path, always_extracting: bool= False) -> Dict[str, Any]:
     """
     Main function to process the disasters data.
     
@@ -65,12 +65,11 @@ def process_data(data_path: Path) -> Dict[str, Any]:
         # Ensure directories exist
         raw_path = data_path / 'raw'
         clean_path = data_path / 'clean'
-        geo_path = data_path / 'geo_mapping'
         
-        for path in [raw_path, clean_path, geo_path]:
+        for path in [raw_path, clean_path]:
             path.mkdir(parents=True, exist_ok=True)
         
-        if (clean_path / "cleaned_disasters.csv").exists():
+        if (clean_path / "cleaned_disasters.csv").exists() and not always_extracting:
             df = pd.read_csv(clean_path / "cleaned_disasters.csv")
             return {
                 "success": True,
@@ -91,13 +90,13 @@ def process_data(data_path: Path) -> Dict[str, Any]:
         
 
         # Save cleaned data
-        final_df = clean_path / "cleaned_disasters.csv"
+        final_df_path = clean_path / "cleaned_disasters.csv"
         if cleaned_df is not None:
-            cleaned_df.to_csv(final_df, index=False)
+            cleaned_df.to_csv(final_df_path, index=False)
                 
         return {
             "success": True,
-            "data" : final_df
+            "data": cleaned_df
         }
         
     except Exception as e:

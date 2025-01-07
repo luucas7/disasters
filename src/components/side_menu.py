@@ -18,9 +18,9 @@ class SideMenu:
                 html.Div([
                     html.H1("Global Disasters Watch", 
                            className="text-xl font-bold "),
-                    html.P("Understanding disasters across time and space",
-                          className="text-sm mt-1")
                 ], className="flex flex-col bg-blue-800 text-white p-4"),
+
+                html.Div([
 
                 html.H2("Global Filters", className="text-lg font-semibold mb-4"),
                 
@@ -52,6 +52,7 @@ class SideMenu:
                     ),
                 ], className="mb-4"),
             ], className="p-4")
+            ], className="")
         ], className="w-64 bg-blue border-r border-gray-200 h-screen fixed left-0 overflow-y-auto")
     
     def _get_year_options(self):

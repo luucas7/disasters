@@ -13,11 +13,28 @@ class EMDATCleaner:
     
     # Constants based on EM-DAT structure
     MONETARY_COLUMNS = [
-        'AID Contribution (\'000 US$)',
         'Reconstruction Costs (\'000 US$)',
         'Insured Damage (\'000 US$)',
         'Total Damage (\'000 US$)'
     ]
+
+    UNUSED_COLUMNS = [
+        'Classification Key',
+        'OFDA/BHA Response',
+        'Appeal',
+        'Declaration',
+        'AID Contribution (\'000 US$)',
+        'River Basin',
+        'Reconstruction Costs (\'000 US$)',
+        'Reconstruction Costs, Adjusted (\'000 US$)',
+        'Insured Damage, Adjusted (\'000 US$)',
+        'Total Damage, Adjusted (\'000 US$)',
+        "Reconstruction Costs, Adjusted ('000 US$)",
+        "Historic","Classification Key","External IDs","Event Name","Origin","Associated Types","OFDA/BHA Response","Appeal","Declaration","AID Contribution ('000 US$)","Magnitude Scale","River Basin","Reconstruction Costs ('000 US$)","Reconstruction Costs, Adjusted ('000 US$)","Insured Damage ('000 US$)","Insured Damage, Adjusted ('000 US$)","Total Damage ('000 US$)","Total Damage, Adjusted ('000 US$)","CPI","Admin Units","Entry Date","Last Update","Year_ID","Sequence_ID","Has_External_IDs","ADM1_Units","ADM2_Units","ADM1_Count","ADM2_Count","Duration_Days","Rivers_List","River_Count"
+
+
+    ]
+
     
     IMPACT_COLUMNS = [
         'Total Deaths',
@@ -277,14 +294,7 @@ class EMDATCleaner:
         'CUW': 'Curacao',
         'IMN': 'Isle of Man',
         'LIE': 'Liechtenstein'
-    }
-
-
-    
-    REGIONS_MAPPING = {
-        'Americas': 'America',
-    }
-        
+    }       
             
 
     def __init__(self, df: pd.DataFrame):
@@ -305,6 +315,10 @@ class EMDATCleaner:
         missing_columns = [col for col in required_columns if col not in self.df.columns]
         if missing_columns:
             raise ValueError(f"Missing required columns: {missing_columns}")
+
+    def delete_useless_columns(self) -> 'EMDATCleaner':
+        self.df.drop(columns=self.UNUSED_COLUMNS, inplace=True)
+        return self
 
     def clean_identifiers(self) -> 'EMDATCleaner':
         """Clean DisNo. and other ID fields."""
@@ -400,37 +414,21 @@ class EMDATCleaner:
         return self
 
     def clean_monetary_values(self) -> 'EMDATCleaner':
-        """Process monetary columns, handling both raw and adjusted values."""
+        """Process monetary columns, handling raw values."""
         for col in self.MONETARY_COLUMNS:
             raw_col = col
-            adjusted_col = col.replace('(\'000 US$)', ', Adjusted (\'000 US$)')
-            
+            cleaned_col = col.replace(" ('000 US$)", "")
+            if cleaned_col != raw_col:
+                logger.info(f"Cleaning monetary column: {raw_col}; cleaned as {cleaned_col}")
             if raw_col in self.df.columns:
-                self.df[raw_col] = pd.to_numeric(self.df[raw_col], errors='coerce')
-                
-            if adjusted_col in self.df.columns:
-                self.df[adjusted_col] = pd.to_numeric(self.df[adjusted_col], errors='coerce')
-                
-            # Calculate adjustment ratio where both values exist
-            if raw_col in self.df.columns and adjusted_col in self.df.columns:
-                mask = (self.df[raw_col] > 0) & (self.df[adjusted_col] > 0)
-                self.df.loc[mask, f'{raw_col}_Adjustment_Ratio'] = (
-                    self.df.loc[mask, adjusted_col] / self.df.loc[mask, raw_col]
-                )
-        
+                self.df[cleaned_col] = pd.to_numeric(self.df[raw_col], errors='coerce')
         return self
 
     def clean_impact_values(self) -> 'EMDATCleaner':
         """Clean impact-related numeric columns."""
         for col in self.IMPACT_COLUMNS:
             if col in self.df.columns:
-                self.df[col] = pd.to_numeric(self.df[col], errors='coerce')
-                
-                # Add quality indicators
-                self.df[f'{col}_is_missing'] = self.df[col].isna()
-                if self.df[col].notna().any():
-                    self.df[f'{col}_is_zero'] = self.df[col] == 0
-                    
+                self.df[col] = pd.to_numeric(self.df[col], errors='coerce')                    
         return self
 
     def clean_geographic_data(self) -> 'EMDATCleaner':
@@ -457,6 +455,7 @@ class EMDATCleaner:
          .clean_impact_values()
          .clean_geographic_data()
          .normalize_country_names()
+         .delete_useless_columns()
         )
         return self.df
 
