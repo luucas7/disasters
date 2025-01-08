@@ -11,7 +11,7 @@ from src.components.card import Card
 from src.graphics.map import Map, register_map_callbacks
 from src.graphics.timed_count import TimedCount, register_timed_count_callbacks
 from src.graphics.pie_chart import DisasterPieChart, register_pie_callbacks
-from src.graphics.statistics import Statistics
+from src.graphics.statistics import Statistics, register_statistics_callbacks
 
 def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
     """Create the main dashboard layout."""
@@ -74,3 +74,4 @@ def init_callbacks(app: Any, data: Any, geojson: Dict[str, Any]) -> None:
     register_map_callbacks(app, data, geojson)
     register_timed_count_callbacks(app, data)
     register_pie_callbacks(app, data)
+    register_statistics_callbacks(app, data)
