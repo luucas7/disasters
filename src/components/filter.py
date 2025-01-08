@@ -65,9 +65,10 @@ class Filter:
             options=[
                 {"label": "Number of Disasters", "value": "count"},
                 {"label": "Total Deaths", "value": "Total Deaths"},
-                {"label": "Total Damage", "value": "Total Damage"},
                 {"label": "Affected people", "value": "Total Affected"},
-                {"label": "Insured Damage", "value": "Insured Damage)"},
+                {"label": "Total Damage ($ USD)", "value": "Total Damage"},
+                {"label": "Insured Damage ($ USD)", "value": "Insured Damage"},
+                {"label": "Reconstruction Costs ($ USD)", "value": "Reconstruction Costs"},
             ],
             value="count"
         )
