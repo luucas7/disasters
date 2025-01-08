@@ -34,7 +34,8 @@ class Map:
             mapbox_zoom=1,
             mapbox_center={"lat": 20, "lon": 0},
             margin={"r": 0, "t": 0, "l": 0, "b": 0},
-            autosize=True
+            autosize=True,
+            
         )
         
         return fig
@@ -49,7 +50,7 @@ class Map:
                 'scrollZoom': True,
                 'displayModeBar': False
             }
-        ), style={'width': '100%', 'height': '500px'})
+        ), className="w-full border-solid border-2")
 
 def register_map_callbacks(app, data, geojson):
     map_viz = Map(data, geojson)
