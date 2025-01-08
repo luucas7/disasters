@@ -32,6 +32,7 @@ class EMDATCleaner:
         "Reconstruction Costs, Adjusted ('000 US$)",
         "Historic","Classification Key","External IDs","Event Name","Origin","Associated Types","OFDA/BHA Response","Appeal","Declaration","AID Contribution ('000 US$)","Magnitude Scale","River Basin","Reconstruction Costs ('000 US$)","Reconstruction Costs, Adjusted ('000 US$)","Insured Damage ('000 US$)","Insured Damage, Adjusted ('000 US$)","Total Damage ('000 US$)","Total Damage, Adjusted ('000 US$)","CPI","Admin Units","Entry Date","Last Update","Year_ID","Sequence_ID","Has_External_IDs","ADM1_Units","ADM2_Units","ADM1_Count","ADM2_Count","Duration_Days","Rivers_List","River_Count"
 
+
     ]
 
     
@@ -248,7 +249,7 @@ class EMDATCleaner:
         'ZWE': 'Zimbabwe',
         'REU': 'Reunion',
         'TUV': 'Tuvalu',
-        'SCG': 'Serbia and Montenegro',
+        'SCG': 'Serbia and Montenegro',  # Ancien pays, maintenant séparé
         'BMU': 'Bermuda',
         'GUF': 'French Guiana',
         'FSM': 'Micronesia',
@@ -256,7 +257,7 @@ class EMDATCleaner:
         'BHR': 'Bahrain',
         'MHL': 'Marshall Islands',
         'PRI': 'Puerto Rico',
-        'ANT': 'Netherlands Antilles',  
+        'ANT': 'Netherlands Antilles',  # Ancien territoire
         'GLP': 'Guadeloupe',
         'SHN': 'Saint Helena',
         'CYM': 'Cayman Islands',
@@ -338,12 +339,44 @@ class EMDATCleaner:
             if col in self.df.columns:
                 self.df[col] = self.df[col].map({'Yes': True, 'No': False})
         return self
+
+    def clean_admin_units(self) -> 'EMDATCleaner':
+        """Process Admin Units JSON data."""
+        if 'Admin Units' not in self.df.columns:
+            return self
+            
+        def extract_admin_info(json_str: str) -> Dict[str, List[str]]:
+            if pd.isna(json_str):
+                return {'adm1': [], 'adm2': []}
+            try:
+                data = json.loads(json_str)
+                return {
+                    'adm1': [unit['adm1_name'] for unit in data if 'adm1_name' in unit],
+                    'adm2': [unit['adm2_name'] for unit in data if 'adm2_name' in unit]
+                }
+            except (json.JSONDecodeError, TypeError):
+                return {'adm1': [], 'adm2': []}
+
+        admin_data = self.df['Admin Units'].apply(extract_admin_info)
+        self.df['ADM1_Units'] = admin_data.apply(lambda x: x['adm1'])
+        self.df['ADM2_Units'] = admin_data.apply(lambda x: x['adm2'])
+        self.df['ADM1_Count'] = self.df['ADM1_Units'].str.len()
+        self.df['ADM2_Count'] = self.df['ADM2_Units'].str.len()
+        
+        return self
+    
     
     def normalize_country_names(self) -> 'EMDATCleaner':
         """Normalize country names using ISO codes and country mapping."""
         if 'ISO' in self.df.columns:
             # Utiliser le code ISO pour déterminer le nom du pays
-            self.df['Country'] = self.df['ISO'].map(self.ISO_TO_COUNTRY)        
+            self.df['Country'] = self.df['ISO'].map(self.ISO_TO_COUNTRY)
+            
+            # Log des codes ISO qui n'ont pas de correspondance
+            missing_iso = self.df[self.df['Country'].isna()]['ISO'].unique()
+            if len(missing_iso) > 0:
+                logger.warning(f"Missing ISO code mappings for: {missing_iso}")
+        
         return self
     
 
@@ -416,6 +449,7 @@ class EMDATCleaner:
         (self
          .clean_identifiers()
          .clean_binary_fields()
+         .clean_admin_units()
          .clean_dates()
          .clean_monetary_values()
          .clean_impact_values()
