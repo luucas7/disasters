@@ -14,7 +14,7 @@ def initialize_app() -> dash.Dash:
     paths = get_project_paths()
 
     # Process data
-    data = process_data(paths["data"], True)["data"]
+    data = process_data(paths["data"], False)["data"]
     geojson = load_countries_geojson(paths["geo_mapping"])
 
     # Initialize app

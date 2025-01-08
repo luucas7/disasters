@@ -1,4 +1,3 @@
-# src/pages/dashboard.py
 from dash import html, dcc
 from typing import Any, Dict
 

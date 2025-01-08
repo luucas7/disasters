@@ -249,7 +249,7 @@ class EMDATCleaner:
         'ZWE': 'Zimbabwe',
         'REU': 'Reunion',
         'TUV': 'Tuvalu',
-        'SCG': 'Serbia and Montenegro',  # Ancien pays, maintenant séparé
+        'SCG': 'Serbia and Montenegro',
         'BMU': 'Bermuda',
         'GUF': 'French Guiana',
         'FSM': 'Micronesia',
@@ -257,7 +257,7 @@ class EMDATCleaner:
         'BHR': 'Bahrain',
         'MHL': 'Marshall Islands',
         'PRI': 'Puerto Rico',
-        'ANT': 'Netherlands Antilles',  # Ancien territoire
+        'ANT': 'Netherlands Antilles',  
         'GLP': 'Guadeloupe',
         'SHN': 'Saint Helena',
         'CYM': 'Cayman Islands',
