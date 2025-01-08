@@ -24,24 +24,12 @@ def group_similar_disasters(data, group=False):
 class DisasterPieChart:
     def __init__(self, data=None):
         self.data = data
-        self.layout = html.Div([    
-            # Légende placeholder        
-            html.Div([
-                dcc.Graph(
-                    id='disaster-pie-legend',
-                    style={'height': '100px'},
-                    config={
-                        'displayModeBar': False,
-                        'displaylogo': False
-                    }
-                )
-            ], className="w-full mb-5"),
-            
-            # Graphique principal
+        self.layout = html.Div([                
+            # Pie chart
             html.Div([
                 dcc.Graph(
                     id='disaster-pie-chart',
-                    style={'height': '350px'},
+                    style={},
                     config={
                         'displayModeBar': False,
                         'displaylogo': False
@@ -55,13 +43,13 @@ class DisasterPieChart:
 
 def register_pie_callbacks(app, data):
     @app.callback(
-        [Output('disaster-pie-chart', 'figure'),
-         Output('disaster-pie-legend', 'figure')],
+        Output('disaster-pie-chart', 'figure'),
         [Input('group-similar-disasters', 'value'),
-         Input('start-year-filter', 'value'),
-         Input('end-year-filter', 'value')]
+        Input('show-other', 'value'), 
+        Input('start-year-filter', 'value'),
+        Input('end-year-filter', 'value')]
     )
-    def update_pie(group_similar, start_year, end_year):
+    def update_pie(group_similar, show_other, start_year, end_year):
         start_year = start_year if start_year is not None else data['Start Year'].min()
         end_year = end_year if end_year is not None else data['Start Year'].max()
         
@@ -74,14 +62,20 @@ def register_pie_callbacks(app, data):
             filtered_data = group_similar_disasters(filtered_data, True)
         
         counts = filtered_data['Disaster Type'].value_counts()
+
+        if show_other and 'other' in show_other:
+            other_mask = counts.rank(ascending=False) > 9
+            if other_mask.any():
+                others_sum = counts[other_mask].sum()
+                counts = counts[~other_mask]
+                counts['Others'] = others_sum
         
-        # Figure principale avec pie chart sans légende
         pie_fig = go.Figure(
             data=[go.Pie(
                 labels=counts.index,
                 values=counts.values,
                 textinfo='none',
-                showlegend=False,
+                showlegend=True,
                 textposition='auto',
                 hole=0.4,
                 marker=dict(
@@ -96,30 +90,4 @@ def register_pie_callbacks(app, data):
             )
         )
         
-        # Figure pour la légende uniquement
-        legend_fig = go.Figure(
-            data=[go.Pie(
-                labels=counts.index,
-                values=counts.values,
-                textinfo='none',
-                showlegend=True,
-                hole=1, # Rend le pie invisible
-            )],
-            layout=dict(
-                showlegend=True,
-                legend=dict(
-                    orientation="h",
-                    yanchor="middle",
-                    y=0.5,
-                    xanchor="center",
-                    x=0.5,
-                    font=dict(size=11),
-                ),
-                margin=dict(l=0, r=0, t=0, b=0),
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                height=100,
-            )
-        )
-
-        return pie_fig, legend_fig
+        return pie_fig

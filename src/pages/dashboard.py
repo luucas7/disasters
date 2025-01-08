@@ -27,6 +27,12 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
         options=[{"label": "Group Similar Disasters", "value": "group"}],
         value=["group"]
     )()
+
+    pie_chart_other_checkbox = Checkbox(
+        id="show-other",
+        options=[{"label": "Show every categories", "value": "other"}],
+        value=["other"]
+    )()
     
     return html.Div([
         SideMenu(data)(),
@@ -58,7 +64,7 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
                 # Pie chart
                 Card(
                     title="Disaster Type Distribution",
-                    filters=[pie_chart_group_checkbox],
+                    filters=[pie_chart_group_checkbox, pie_chart_other_checkbox],
                     className='min-h-[900px]'
                 )(DisasterPieChart(data)())
             ], className="w-1/3 flex flex-col gap-4"),
