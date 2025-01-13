@@ -35,22 +35,27 @@ class Map:
             mapbox_center={"lat": 20, "lon": 0},
             margin={"r": 0, "t": 0, "l": 0, "b": 0},
             autosize=True,
-            
         )
         
         return fig
 
     def __call__(self):
         fig = self.create_figure()
-        return html.Div(dcc.Graph(
-            figure=fig,
-            id="map",
-            config={
-                'doubleClick': 'reset+autosize',
-                'scrollZoom': True,
-                'displayModeBar': False
-            }
-        ), className="w-full border-solid border-2")
+        return html.Div([
+            dcc.Loading(
+                id="loading-map",
+                type="default",
+                children=dcc.Graph(
+                    figure=fig,
+                    id="map",
+                    config={
+                        'doubleClick': 'reset+autosize',
+                        'scrollZoom': True,
+                        'displayModeBar': False
+                    }
+                )
+            )
+        ], className="w-full border-solid border-2")
 
 def register_map_callbacks(app, data, geojson):
     map_viz = Map(data, geojson)
