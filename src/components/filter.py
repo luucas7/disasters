@@ -1,78 +1,90 @@
 from dash import html, dcc
-from typing import Any
+from typing import Any, List, Dict
 
 class Filter:
-    """Filter sidebar component."""
+    """Collection of reusable filter components with enhanced styling."""
     
     def __init__(self, data: Any = None):
         self.data = data
-        self.layout = html.Div([
-            html.Div([
-                html.H2("Filters", className="text-lg font-semibold mb-4"),
-                
-                # Year filter
-                html.Div([
-                    html.Label("Year", className="block text-sm font-medium text-gray-700"),
-                    dcc.Dropdown(
-                        id='year-filter',
-                        options=self._get_year_options() if self.data is not None else [],
-                        value='All',
-                        className="mt-1"
-                    )
-                ], className="mb-4"),
-                
-                # Disaster type filter
-                html.Div([
-                    html.Label("Disaster type", 
-                             className="block text-sm font-medium text-gray-700"),
-                    dcc.Dropdown(
-                        id='disaster-type-filter',
-                        options=self._get_disaster_options() if self.data is not None else [],
-                        value='All',
-                        className="mt-1"
-                    )
-                ], className="mb-4"),
-                
-                # Region filter
-                html.Div([
-                    html.Label("Region", className="block text-sm font-medium text-gray-700"),
-                    dcc.Dropdown(
-                        id='region-filter',
-                        options=self._get_region_options() if self.data is not None else [],
-                        value='All',
-                        className="mt-1"
-                    )
-                ], className="mb-4"),
-                
-            ], className="p-4")
-        ], className="w-64 bg-white border-r border-gray-200 h-screen fixed left-0 top-16 overflow-y-auto")
+
+    def dropdown_filter(self, id: str, label: str, options: List[Dict], value: Any = None) -> html.Div:
+        """Create a styled dropdown filter."""
+        return html.Div([
+            html.Label(
+                label,
+                className="block text-base font-medium text-sage-700 mb-2"
+            ),
+            dcc.Dropdown(
+                id=id,
+                options=options,
+                value=value,
+                className="rounded-md border-sage-200 focus:border-sage-500 focus:ring-sage-500",
+                style={
+                    'min-width': '230px'
+                },
+                placeholder=f"Select {label.lower()}..."
+            ),
+        ], className="mb-6 relative group")  # group pour interactions
     
-    def _get_year_options(self):
-        if self.data is not None:
-            years = sorted(self.data['Start Year'].unique(), reverse=True)
-            return [{'label': 'All', 'value': 'All'}] + [{'label': str(year), 'value': year} for year in years]
-        return []
-    
-    def _get_max_year(self):
-        if self.data is not None:
-            return self.data['Start Year'].max()
-        return None
-    
+    def disaster_filter(self):
+        """Create a disaster type filter dropdown."""
+        return self.dropdown_filter(
+            id="disaster-type-filter",
+            label="Disaster Type",
+            options=self._get_disaster_options(),
+            value="All"
+        )
+
+    def region_filter(self):
+        """Create a region filter dropdown."""
+        return self.dropdown_filter(
+            id="region-filter",
+            label="Region",
+            options=self._get_region_options(),
+            value="All"
+        )
+
+    def group_by_filter(self):
+        """Create a group by filter dropdown."""
+        return self.dropdown_filter(
+            id="group-by-filter",
+            label="Group By",
+            options=[
+                {"label": "Region", "value": "Region"},
+                {"label": "Subregion", "value": "Subregion"},
+                {"label": "Disaster Type", "value": "Disaster Type"},
+            ],
+            value="Region"
+        )
+
+    def impact_metric_filter(self):
+        """Create an impact metric filter dropdown."""
+        return self.dropdown_filter(
+            id="impact-metric-filter",
+            label="Impact Metric",
+            options=[
+                {"label": "Number of Disasters", "value": "count"},
+                {"label": "Total Deaths", "value": "Total Deaths"},
+                {"label": "Affected people", "value": "Total Affected"},
+                {"label": "Total Damage ($ USD)", "value": "Total Damage"},
+                {"label": "Insured Damage ($ USD)", "value": "Insured Damage"},
+                {"label": "Reconstruction Costs ($ USD)", "value": "Reconstruction Costs"},
+            ],
+            value="count"
+        )
+
     def _get_disaster_options(self):
         if self.data is not None:
-            disasters = sorted(self.data['Disaster Type'].unique())
-            return [{'label': 'All', 'value': 'All'}] + [
-                {'label': disaster, 'value': disaster} for disaster in disasters
-            ]
-        return []
-    
-    def _get_region_options(self):
-        if self.data is not None:
-            regions = sorted(self.data['Region'].unique())
-            return [{'label': 'All', 'value': 'All'}] + [
-                {'label': region, 'value': region} for region in regions
+            disasters = sorted(self.data["Disaster Type"].unique())
+            return [{"label": "All", "value": "All"}] + [
+                {"label": disaster, "value": disaster} for disaster in disasters
             ]
         return []
 
-    def __call__(self):
-        return self.layout
+    def _get_region_options(self):
+        if self.data is not None:
+            regions = sorted(self.data["Region"].unique())
+            return [{"label": "All", "value": "All"}] + [
+                {"label": region, "value": region} for region in regions
+            ]
+        return []

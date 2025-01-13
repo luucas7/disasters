@@ -1,87 +1,83 @@
-from dash import html
-from dash.dependencies import Input, Output
+from dash import html, dcc
 from typing import Any, Dict
 
 from src.components.navbar import Navbar
 from src.components.filter import Filter
-from src.components.main_content import MainContent
+from src.components.checkbox import Checkbox
+from src.components.side_menu import SideMenu
+from src.components.card import Card
+
+# Graphics components
+from src.graphics.map import Map, register_map_callbacks
+from src.graphics.timed_count import TimedCount, register_timed_count_callbacks
+from src.graphics.pie_chart import DisasterPieChart, register_pie_callbacks
+from src.graphics.statistics import Statistics, register_statistics_callbacks
 
 def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
-    """
-    Create the main dashboard layout.
+    """Create the main dashboard layout."""
     
-    Args:
-        data: DataFrame containing the disaster data
-        geojson: GeoJSON data for the map
-    """
+    filters = Filter(data)
+    disaster_filter = filters.disaster_filter()
+    region_filter = filters.region_filter()
+    group_by_filter = filters.group_by_filter()
+    impact_metric_filter = filters.impact_metric_filter()           
+    
+    pie_chart_group_checkbox = Checkbox(
+        id="group-similar-disasters",
+        options=[{"label": "Group Similar Disasters", "value": "group"}],
+        value=["group"]
+    )()
+
+    pie_chart_other_checkbox = Checkbox(
+        id="show-other",
+        options=[{"label": "Show every categories", "value": "other"}],
+        value=["other"]
+    )()
+    
     return html.Div([
-        # Main container with flex layout
+        SideMenu(data)(),
+                
+        # Main content
         html.Div([
-            Navbar()(),
-            Filter(data)(),
-            MainContent(data, geojson)()
-        ], className="flex h-screen")
+            # Left column - Main visualizations
+            html.Div([
+                # Map
+                Card(
+                    title="Geographic Distribution",
+                    filters=[disaster_filter, region_filter]
+                )(Map(data, geojson)()),
+                
+                # Time series chart
+                Card(
+                    title="Temporal Evolution",
+                    filters=[group_by_filter, impact_metric_filter]
+                )(TimedCount(data)())
+            ], className="flex-1 flex flex-col gap-4"),
+            
+            # Right column - Secondary visualizations and stats
+            html.Div([
+                # Database stats card
+                Card(
+                    title="Database Statistics",
+                )(Statistics(data)()),
+                
+                # Pie chart
+                Card(
+                    title="Disaster Type Distribution",
+                    filters=[pie_chart_group_checkbox, pie_chart_other_checkbox],
+                    className='min-h-[900px]'
+                )(DisasterPieChart(data)())
+            ], className="w-1/3 flex flex-col gap-4"),
+
+        ], className="flex gap-4 p-4 ml-64 bg-gray-100 min-h-screen")
     ])
 
 def init_callbacks(app: Any, data: Any, geojson: Dict[str, Any]) -> None:
-    """
-    Initialize dashboard callbacks.
+    """Initialize dashboard callbacks."""
+    app.config.suppress_callback_exceptions = True
     
-    Args:
-        app: Dash application instance
-        data: DataFrame containing the disaster data
-        geojson: GeoJSON data for the map
-    """
-    @app.callback(
-        Output('main-map', 'figure'),
-        [Input('year-filter', 'value'),
-         Input('disaster-type-filter', 'value'),
-         Input('region-filter', 'value')]
-    )
-    
-    def update_map(year: int, disaster_type: str, region: str) -> Dict[str, Any]:
-        filtered_data = data.copy()
-        
-        # Appliquer les filtres
-        if disaster_type and disaster_type != 'All':
-            filtered_data = filtered_data[filtered_data['Disaster Type'] == disaster_type]
-            
-        if region and region != 'All':
-            filtered_data = filtered_data[filtered_data['Region'] == region]
-        
-        # Traitement différent selon si on veut toutes les années ou une année spécifique
-        if year and year != 'All':
-            # Pour une année spécifique
-            filtered_data = filtered_data[filtered_data['Start Year'] == year]
-            # Compter le nombre de catastrophes par pays
-            counts_by_country = filtered_data.groupby('Country').size().reset_index(name='Disaster_Count')
-        else:
-            # Pour toutes les années, on somme le nombre total de catastrophes par pays
-            counts_by_country = filtered_data.groupby('Country').size().reset_index(name='Disaster_Count')
-            
-        return {
-            'data': [{
-                'type': 'choroplethmapbox',
-                'geojson': geojson,
-                'locations': counts_by_country['Country'],
-                'z': counts_by_country['Disaster_Count'],
-                'featureidkey': "properties.ADMIN",
-                'colorscale': "Viridis",
-                'marker': {
-                    'opacity': 0.5,
-                    'line': {'width': 0}
-                },
-                'hovertemplate': "<b>%{location}</b><br>" +
-                                "Disaster count: %{z}<br>" +
-                                "<extra></extra>"
-            }],
-            'layout': {
-                'mapbox': {
-                    'style': "carto-positron",
-                    'zoom': 1,
-                    'center': {"lat": 20, "lon": 0}
-                },
-                'margin': {"r":0,"t":0,"l":0,"b":0},
-                'autosize': True
-            }
-        }
+    # Register callbacks from components
+    register_map_callbacks(app, data, geojson)
+    register_timed_count_callbacks(app, data)
+    register_pie_callbacks(app, data)
+    register_statistics_callbacks(app, data)
