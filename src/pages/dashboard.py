@@ -44,13 +44,13 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
             html.Div([
                 # Map only
                 Card(
-                    title="Geographic Distribution",
+                    title="Number of disasters around the world",
                     filters=[disaster_filter, region_filter]
                 )(Map(data, geojson)()),
                 
                 # Time series chart
                 Card(
-                    title="Temporal Evolution",
+                    title="Temporal Evolution of the number of disasters",
                     filters=[group_by_filter, impact_metric_filter]
                 )(TimedCount(data)())
             ], className="flex-1 flex flex-col gap-4"),

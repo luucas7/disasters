@@ -99,8 +99,6 @@ def register_details_callbacks(app, data):
             filtered_data = filtered_data[filtered_data['Start Year'] >= start_year]
         if end_year is not None:
             filtered_data = filtered_data[filtered_data['Start Year'] <= end_year]
-        if disaster_type and disaster_type != "All":
-            filtered_data = filtered_data[filtered_data['Disaster Type'] == disaster_type]
         if region and region != "All":
             filtered_data = filtered_data[filtered_data['Region'] == region]
         
