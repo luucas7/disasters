@@ -3,6 +3,7 @@ from dash.dependencies import Input, Output
 from dash import dcc, html
 from typing import Any, Dict
 import numpy as np
+import pandas as pd
 
 class Map:
     def __init__(self, data, geojson):
@@ -25,7 +26,8 @@ class Map:
             marker_opacity=0.5,
             marker_line_width=0,
             hovertemplate="<b>%{customdata[1]}</b><br>" +
-                         "Number of disasters: %{customdata[0]:,}<extra></extra>",
+                         "Number of disasters: %{customdata[0]:,}<br>" +
+                         "Click for details<extra></extra>",
             customdata=counts_by_country[['Disaster_Count','Country']].values
         ))
 
@@ -35,6 +37,7 @@ class Map:
             mapbox_center={"lat": 20, "lon": 0},
             margin={"r": 0, "t": 0, "l": 0, "b": 0},
             autosize=True,
+            clickmode='event+select'  # Enable click events
         )
         
         return fig
@@ -44,7 +47,7 @@ class Map:
         return html.Div([
             dcc.Loading(
                 id="loading-map",
-                type="default",
+                type="circle",
                 children=dcc.Graph(
                     figure=fig,
                     id="map",

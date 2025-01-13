@@ -12,6 +12,7 @@ from src.graphics.map import Map, register_map_callbacks
 from src.graphics.timed_count import TimedCount, register_timed_count_callbacks
 from src.graphics.pie_chart import DisasterPieChart, register_pie_callbacks
 from src.graphics.statistics import Statistics, register_statistics_callbacks
+from src.graphics.country_details import CountryDetails, register_details_callbacks
 
 def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
     """Create the main dashboard layout."""
@@ -39,9 +40,9 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
                 
         # Main content
         html.Div([
-            # Left column - Main visualizations
+            # Left side - Main visualizations
             html.Div([
-                # Map
+                # Map only
                 Card(
                     title="Geographic Distribution",
                     filters=[disaster_filter, region_filter]
@@ -56,9 +57,14 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
             
             # Right column - Secondary visualizations and stats
             html.Div([
-                # Database stats card
+                # Country details card
                 Card(
-                    title="Database Statistics",
+                    title="Country Details"
+                )(CountryDetails(data)()),
+                
+                # Statistics card
+                Card(
+                    title="Database Statistics"
                 )(Statistics(data)()),
                 
                 # Pie chart
@@ -81,3 +87,4 @@ def init_callbacks(app: Any, data: Any, geojson: Dict[str, Any]) -> None:
     register_timed_count_callbacks(app, data)
     register_pie_callbacks(app, data)
     register_statistics_callbacks(app, data)
+    register_details_callbacks(app, data)
