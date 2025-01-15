@@ -59,14 +59,14 @@ def read_raw_disaster_data(file_path: Path) -> Optional[DataFrame]:
         logger.error(f"Error reading Excel file: {e}")
         return None
 
-def process_data(data_path: Path, extracting: bool = False, scraping: bool = False) -> Dict[str, Any]:
+def process_data(data_path: Path, force_clean: bool = False, force_scrape: bool = False) -> Dict[str, Any]:
     """
     Main function to process the disasters data.
     
     Args:
         data_path: Path to base data directory
-        extracting: Force data reprocessing even if cleaned data exists
-        scraping: Enable web scraping to get fresh data
+        force_clean: Force data reprocessing even if cleaned data exists
+        force_scrape: Enable web scraping to get fresh data
     """
     try:
         # Ensure directories exist
@@ -77,7 +77,7 @@ def process_data(data_path: Path, extracting: bool = False, scraping: bool = Fal
             path.mkdir(parents=True, exist_ok=True)
         
         # Check if we need to process data
-        if not extracting and not scraping and (clean_path / "cleaned_disasters.csv").exists():
+        if not force_clean and not force_scrape and (clean_path / "cleaned_disasters.csv").exists():
             df = pd.read_csv(clean_path / "cleaned_disasters.csv")
             return {
                 "success": True,
@@ -85,7 +85,7 @@ def process_data(data_path: Path, extracting: bool = False, scraping: bool = Fal
             }
         
         # Download fresh data if scraping is enabled
-        if scraping:
+        if force_scrape:
             URL = "https://public.emdat.be"
             download_dir = str(os.path.abspath(raw_path))
             try:
