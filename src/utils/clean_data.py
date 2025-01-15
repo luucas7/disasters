@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 import json
 from . import logger
-from typing import Optional
 
 class EMDATCleaner:
     """

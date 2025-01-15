@@ -93,7 +93,7 @@ def process_data(data_path: Path, force_clean: bool = False, force_scrape: bool 
                 logger.info("Downloading data from EMDAT website")
                 download_from_site(URL, USERNAME, PASSWORD, download_dir, RAW_DISASTER_DATA_FILE)
             except ImportError:
-                logger.error("Please provide a emdat USERNAME and PASSWORD in a config.py file")
+                logger.error("Please provide a emdat USERNAME and PASSWORD in a config.py file at project root")
                 return {"success": False, "error": "No credentials provided"}
         
         # Read raw data
