@@ -6,7 +6,6 @@ from pandas import DataFrame
 from . import logger
 from .clean_data import process_and_clean_data
 from selenium import webdriver
-from config import USERNAME, PASSWORD
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -15,7 +14,6 @@ import time
 import os
 
 RAW_DISASTER_DATA_FILE = "public_emdat.xlsx"
-
 
 def convert_to_csv(excel_path: Path, output_path: Path) -> bool:
     """
@@ -33,7 +31,6 @@ def convert_to_csv(excel_path: Path, output_path: Path) -> bool:
     except Exception as e:
         logger.error(f"Error converting Excel to CSV: {e}")
         return False
-
 
 def read_raw_disaster_data(file_path: Path) -> Optional[DataFrame]:
     """
@@ -62,12 +59,14 @@ def read_raw_disaster_data(file_path: Path) -> Optional[DataFrame]:
         logger.error(f"Error reading Excel file: {e}")
         return None
 
-def process_data(data_path: Path, always_extracting: bool= False) -> Dict[str, Any]:
+def process_data(data_path: Path, force_clean: bool = False, force_scrape: bool = False) -> Dict[str, Any]:
     """
     Main function to process the disasters data.
     
     Args:
         data_path: Path to base data directory
+        force_clean: Force data reprocessing even if cleaned data exists
+        force_scrape: Enable web scraping to get fresh data
     """
     try:
         # Ensure directories exist
@@ -77,35 +76,43 @@ def process_data(data_path: Path, always_extracting: bool= False) -> Dict[str, A
         for path in [raw_path, clean_path]:
             path.mkdir(parents=True, exist_ok=True)
         
-        if (not always_extracting):
+        # Check if we need to process data
+        if not force_clean and not force_scrape and (clean_path / "cleaned_disasters.csv").exists():
+            df = pd.read_csv(clean_path / "cleaned_disasters.csv")
+            return {
+                "success": True,
+                "data": df
+            }
+        
+        # Download fresh data if scraping is enabled
+        if force_scrape:
             URL = "https://public.emdat.be"
             download_dir = str(os.path.abspath(raw_path))
-            download_from_site(URL, USERNAME, PASSWORD, download_dir, RAW_DISASTER_DATA_FILE)
-            
-            if (clean_path / "cleaned_disasters.csv").exists():
-                df = pd.read_csv(clean_path / "cleaned_disasters.csv")
-                return {
-                    "success": True,
-                    "data": df
-                }
+            try:
+                from config import USERNAME, PASSWORD
+                logger.info("Downloading data from EMDAT website")
+                download_from_site(URL, USERNAME, PASSWORD, download_dir, RAW_DISASTER_DATA_FILE)
+            except ImportError:
+                logger.error("Please provide a emdat USERNAME and PASSWORD in a config.py file at project root")
+                return {"success": False, "error": "No credentials provided"}
         
         # Read raw data
         raw_df = read_raw_disaster_data(raw_path)
         if raw_df is None:
             return {"success": False, "error": "Failed to read raw data"}
         
-        # Convert to CSV for readability, bien mieux
+        # Convert to CSV for readability
         csv_path = raw_path / "raw_disasters.csv"
         convert_to_csv(raw_path / RAW_DISASTER_DATA_FILE, csv_path)
         
-        # Clean data first
+        # Clean data
         cleaned_df = process_and_clean_data(raw_df)
-        
+        if cleaned_df is None:
+            return {"success": False, "error": "Failed to clean data"}
 
         # Save cleaned data
         final_df_path = clean_path / "cleaned_disasters.csv"
-        if cleaned_df is not None:
-            cleaned_df.to_csv(final_df_path, index=False)
+        cleaned_df.to_csv(final_df_path, index=False)
                 
         return {
             "success": True,
@@ -118,8 +125,7 @@ def process_data(data_path: Path, always_extracting: bool= False) -> Dict[str, A
             "success": False, 
             "error": str(e)
         }
-        
-        
+
 def load_countries_geojson(geo_path: Path) -> Dict[str, Any]:
     """
     Load the countries GeoJSON data.
@@ -142,8 +148,17 @@ def load_countries_geojson(geo_path: Path) -> Dict[str, Any]:
         logger.error(f"Error reading GeoJSON file: {e}")
         return None
     
-def download_from_site(url, username, password, download_path, filename):
-    # Configure Chrome options for download
+def download_from_site(url: str, username: str, password: str, download_path: str, filename: str) -> None:
+    """
+    Download data file from EMDAT website using Selenium.
+    
+    Args:
+        url: Base URL of the EMDAT website
+        username: EMDAT login username 
+        password: EMDAT login password
+        download_path: Directory to save downloaded file
+        filename: Name to save the file as
+    """
     chrome_options = Options()
     chrome_options.add_experimental_option(
         "prefs",
@@ -176,14 +191,12 @@ def download_from_site(url, username, password, download_path, filename):
         )
         login_button.click()
         
-        
-        #Go to data page
+        # Go to data page
         go_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='/data']"))
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='/data']"))
         )
         go_button.click()
 
-        
         # Click download button
         download_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Download')]"))
@@ -193,6 +206,7 @@ def download_from_site(url, username, password, download_path, filename):
         # Wait for download to complete
         time.sleep(7)
         
+        # Rename downloaded file
         downloaded_file = max(
             [os.path.join(download_path, f) for f in os.listdir(download_path)],
             key=os.path.getctime
