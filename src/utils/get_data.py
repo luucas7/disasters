@@ -5,8 +5,16 @@ import pandas as pd
 from pandas import DataFrame
 from . import logger
 from .clean_data import process_and_clean_data
+from selenium import webdriver
+from config import USERNAME, PASSWORD
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
+import time
+import os
 
-RAW_DISASTER_DATA_FILE = "public_emdat_custom_request_2024-12-26_cde276d8-746c-45c1-8c28-51e1fef813a6.xlsx"
+RAW_DISASTER_DATA_FILE = "public_emdat.xlsx"
 
 
 def convert_to_csv(excel_path: Path, output_path: Path) -> bool:
@@ -69,12 +77,17 @@ def process_data(data_path: Path, always_extracting: bool= False) -> Dict[str, A
         for path in [raw_path, clean_path]:
             path.mkdir(parents=True, exist_ok=True)
         
-        if (clean_path / "cleaned_disasters.csv").exists() and not always_extracting:
-            df = pd.read_csv(clean_path / "cleaned_disasters.csv")
-            return {
-                "success": True,
-                "data": df
-            }
+        if (not always_extracting):
+            URL = "https://public.emdat.be"
+            download_dir = str(os.path.abspath(raw_path))
+            download_from_site(URL, USERNAME, PASSWORD, download_dir, RAW_DISASTER_DATA_FILE)
+            
+            if (clean_path / "cleaned_disasters.csv").exists():
+                df = pd.read_csv(clean_path / "cleaned_disasters.csv")
+                return {
+                    "success": True,
+                    "data": df
+                }
         
         # Read raw data
         raw_df = read_raw_disaster_data(raw_path)
@@ -128,3 +141,66 @@ def load_countries_geojson(geo_path: Path) -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"Error reading GeoJSON file: {e}")
         return None
+    
+def download_from_site(url, username, password, download_path, filename):
+    # Configure Chrome options for download
+    chrome_options = Options()
+    chrome_options.add_experimental_option(
+        "prefs",
+        {
+            "download.default_directory": download_path,
+            "download.prompt_for_download": False,
+            "download.directory_upgrade": True,
+            "download.suggested_name": filename,
+        }
+    )
+    
+    driver = webdriver.Chrome(options=chrome_options)
+    
+    try:
+        # Navigate to the login page
+        driver.get(f"{url}/login")
+        
+        # Wait for login form elements and fill them
+        username_field = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "username")) 
+        )
+        password_field = driver.find_element(By.ID, "password")  
+        
+        username_field.send_keys(username)
+        password_field.send_keys(password)
+        
+        # Submit login form
+        login_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.ant-btn-primary[type='submit']"))
+        )
+        login_button.click()
+        
+        
+        #Go to data page
+        go_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='/data']"))
+        )
+        go_button.click()
+
+        
+        # Click download button
+        download_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Download')]"))
+        )
+        download_button.click()
+        
+        # Wait for download to complete
+        time.sleep(7)
+        
+        downloaded_file = max(
+            [os.path.join(download_path, f) for f in os.listdir(download_path)],
+            key=os.path.getctime
+        )
+        target_file = os.path.join(download_path, filename)
+        if os.path.exists(target_file):
+            os.remove(target_file) 
+        os.rename(downloaded_file, target_file)
+        
+    finally:
+        driver.quit()
