@@ -17,6 +17,7 @@ class Filter:
             dcc.Dropdown(
                 id=id,
                 options=options,
+                clearable=False,
                 value=value,
                 className="rounded-md border-sage-200 focus:border-sage-500 focus:ring-sage-500",
                 style={
