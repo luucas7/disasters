@@ -15,14 +15,17 @@ from src.graphics.statistics import Statistics, register_statistics_callbacks
 from src.graphics.country_details import CountryDetails, register_details_callbacks
 from src.graphics.disaster_table import DisasterTable, register_table_callbacks
 
-def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
+def create_dashboard_layout(data: Any, geojson: Dict[str, Any], areas: Dict[str, float]) -> html.Div:
     """Create the main dashboard layout."""
     
     filters = Filter(data)
-    disaster_filter = filters.disaster_filter()
-    region_filter = filters.region_filter()
-    group_by_filter = filters.group_by_filter()
-    impact_metric_filter = filters.impact_metric_filter()           
+    disaster_filter = filters.disaster_filter("disaster-type-filter")
+    region_filter = filters.region_filter("region-filter")
+    group_by_filter = filters.group_by_filter("group-by-filter")
+    temporal_impact_metric_filter = filters.temporal_impact_metric_filter("temporal-impact-metric-filter")
+    map_impact_metric_filter = filters.map_impact_metric_filter("map-impact-metric-filter")
+
+
     
     pie_chart_group_checkbox = Checkbox(
         id="group-similar-disasters",
@@ -45,18 +48,15 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
             html.Div([
                 # Map only
                 Card(
-                    title="Number of disasters around the world",
-                    filters=[disaster_filter, region_filter]
-                )(Map(data, geojson)()),
+                    title="Disaster Density by Country",
+                    filters=[disaster_filter, region_filter, map_impact_metric_filter]
+                )(Map(data, geojson, areas)()),
                 
                 # Time series chart
                 Card(
                     title="Temporal Evolution of the number of disasters",
-                    filters=[group_by_filter, impact_metric_filter]
+                    filters=[group_by_filter, temporal_impact_metric_filter]
                 )(TimedCount(data)()),
-
-                
-
             ], className="flex-1 flex flex-col gap-4"),
             
             # Right column - Secondary visualizations and stats
@@ -89,12 +89,12 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
         ], className="flex gap-4 p-4 ml-64 bg-gray-100 min-h-screen")
     ])
 
-def init_callbacks(app: Any, data: Any, geojson: Dict[str, Any]) -> None:
+def init_callbacks(app: Any, data: Any, geojson: Dict[str, Any], areas: Dict[str, float]) -> None:
     """Initialize dashboard callbacks."""
     app.config.suppress_callback_exceptions = True
     
     # Register callbacks from components
-    register_map_callbacks(app, data, geojson)
+    register_map_callbacks(app, data, geojson, areas)
     register_timed_count_callbacks(app, data)
     register_pie_callbacks(app, data)
     register_statistics_callbacks(app, data)

@@ -1,5 +1,5 @@
 import dash
-from src.utils.get_data import process_data, load_countries_geojson
+from src.utils.get_data import process_data, load_json_file, load_areas_file
 from src.utils.settings import get_project_paths
 from src.pages.dashboard import create_dashboard_layout, init_callbacks
 import argparse
@@ -45,12 +45,15 @@ def initialize_app(force_clean: bool = False, force_scrape: bool = False) -> das
     
     # Process data with new parameters
     data = process_data(
-        paths["data"], 
+        paths["data"],
         force_clean=force_clean,
         force_scrape=force_scrape
     )["data"]
     
-    geojson = load_countries_geojson(paths["geo_mapping"])
+    geojson = load_json_file(paths["geojson_file"])
+    areas = load_areas_file(paths["areas_file"])
+
+
     
     # Initialize app
     app = dash.Dash(
@@ -62,10 +65,10 @@ def initialize_app(force_clean: bool = False, force_scrape: bool = False) -> das
     )
     
     # Set up layout
-    app.layout = create_dashboard_layout(data, geojson)
+    app.layout = create_dashboard_layout(data, geojson, areas)
     
     # Initialize callbacks
-    init_callbacks(app, data, geojson)
+    init_callbacks(app, data, geojson, areas)
     
     return app
 

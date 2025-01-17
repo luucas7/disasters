@@ -30,8 +30,6 @@ class EMDATCleaner:
         'Total Damage, Adjusted (\'000 US$)',
         "Reconstruction Costs, Adjusted ('000 US$)",
         "Historic","Classification Key","External IDs","Event Name","Origin","Associated Types","OFDA/BHA Response","Appeal","Declaration","AID Contribution ('000 US$)","Magnitude Scale","River Basin","Reconstruction Costs ('000 US$)","Reconstruction Costs, Adjusted ('000 US$)","Insured Damage ('000 US$)","Insured Damage, Adjusted ('000 US$)","Total Damage ('000 US$)","Total Damage, Adjusted ('000 US$)","CPI","Admin Units","Entry Date","Last Update","Year_ID","Sequence_ID","Has_External_IDs","ADM1_Units","ADM2_Units","ADM1_Count","ADM2_Count","Duration_Days","Rivers_List","River_Count"
-
-
     ]
 
     
@@ -292,7 +290,8 @@ class EMDATCleaner:
         'VGB': 'British Virgin Islands',
         'CUW': 'Curacao',
         'IMN': 'Isle of Man',
-        'LIE': 'Liechtenstein'
+        'LIE': 'Liechtenstein',
+        'XXK': 'Kosovo',
     }
             
 
