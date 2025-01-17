@@ -19,10 +19,13 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any], areas: Dict[str,
     """Create the main dashboard layout."""
     
     filters = Filter(data)
-    disaster_filter = filters.disaster_filter()
-    region_filter = filters.region_filter()
-    group_by_filter = filters.group_by_filter()
-    impact_metric_filter = filters.impact_metric_filter()           
+    disaster_filter = filters.disaster_filter("disaster-type-filter")
+    region_filter = filters.region_filter("region-filter")
+    group_by_filter = filters.group_by_filter("group-by-filter")
+    temporal_impact_metric_filter = filters.temporal_impact_metric_filter("temporal-impact-metric-filter")
+    map_impact_metric_filter = filters.map_impact_metric_filter("map-impact-metric-filter")
+
+
     
     pie_chart_group_checkbox = Checkbox(
         id="group-similar-disasters",
@@ -46,13 +49,13 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any], areas: Dict[str,
                 # Map only
                 Card(
                     title="Disaster Density by Country",
-                    filters=[disaster_filter, region_filter]
+                    filters=[disaster_filter, region_filter, map_impact_metric_filter]
                 )(Map(data, geojson, areas)()),
                 
                 # Time series chart
                 Card(
                     title="Temporal Evolution of the number of disasters",
-                    filters=[group_by_filter, impact_metric_filter]
+                    filters=[group_by_filter, temporal_impact_metric_filter]
                 )(TimedCount(data)()),
             ], className="flex-1 flex flex-col gap-4"),
             

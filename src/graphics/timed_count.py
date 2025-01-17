@@ -93,7 +93,7 @@ def register_timed_count_callbacks(app, data):
             Input("start-year-filter", "value"),
             Input("end-year-filter", "value"),
             Input("group-by-filter", "value"),
-            Input("impact-metric-filter", "value"),
+            Input("temporal-impact-metric-filter", "value"),
         ],
     )
     def update_time_series(

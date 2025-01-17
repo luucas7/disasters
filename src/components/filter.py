@@ -27,28 +27,28 @@ class Filter:
             ),
         ], className="mb-6 relative group")  # group pour interactions
     
-    def disaster_filter(self):
+    def disaster_filter(self, id):
         """Create a disaster type filter dropdown."""
         return self.dropdown_filter(
-            id="disaster-type-filter",
+            id=id,
             label="Disaster Type",
             options=self._get_disaster_options(),
             value="All"
         )
 
-    def region_filter(self):
+    def region_filter(self, id):
         """Create a region filter dropdown."""
         return self.dropdown_filter(
-            id="region-filter",
+            id=id,
             label="Region",
             options=self._get_region_options(),
             value="All"
         )
 
-    def group_by_filter(self):
+    def group_by_filter(self, id):
         """Create a group by filter dropdown."""
         return self.dropdown_filter(
-            id="group-by-filter",
+            id=id,
             label="Group By",
             options=[
                 {"label": "Region", "value": "Region"},
@@ -58,10 +58,10 @@ class Filter:
             value="Region"
         )
 
-    def impact_metric_filter(self):
+    def temporal_impact_metric_filter(self, id):
         """Create an impact metric filter dropdown."""
         return self.dropdown_filter(
-            id="impact-metric-filter",
+            id=id,
             label="Impact Metric",
             options=[
                 {"label": "Number of Disasters", "value": "count"},
@@ -72,6 +72,18 @@ class Filter:
                 {"label": "Reconstruction Costs ($ USD)", "value": "Reconstruction Costs"},
             ],
             value="count"
+        )
+    
+    def map_impact_metric_filter(self, id):
+        """Create an impact metric filter dropdown."""
+        return self.dropdown_filter(
+            id=id,
+            label="Impact Metric",
+            options=[
+                {"label": "Disaster density (/km²)", "value": "Density"},
+                {"label": "Disaster count", "value": "Count"},
+            ],
+            value="Density"
         )
 
     def _get_disaster_options(self):
