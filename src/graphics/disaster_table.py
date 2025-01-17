@@ -1,18 +1,68 @@
-import plotly.graph_objects as go
+import dash_ag_grid as dag
 from dash.dependencies import Input, Output
-from dash import dcc, html
-from typing import Any, Dict
+from dash import html
+from typing import Any
 import pandas as pd
 
 class DisasterTable:
     def __init__(self, data: pd.DataFrame):
         self.data = data
+        self.column_defs = [
+            {
+                "field": "Year",
+                "headerName": "Year",
+                "filter": "agNumberColumnFilter",
+                "sortable": True,
+                "width": 100,
+                "headerClass": "text-blue-600"
+            },
+            {
+                "field": "Type",
+                "headerName": "Disaster Type",
+                "filter": True,
+                "sortable": True,
+                "width": 150,
+                "headerClass": "text-blue-600"
+            },
+            {
+                "field": "Country",
+                "headerName": "Country",
+                "filter": True,
+                "sortable": True,
+                "width": 140,
+                "headerClass": "text-blue-600"
+            },
+            {
+                "field": "Location",
+                "headerName": "Location",
+                "filter": True,
+                "sortable": True,
+                "width": 180,
+                "headerClass": "text-blue-600"
+            },
+            {
+                "field": "Deaths",
+                "headerName": "Deaths",
+                "filter": "agNumberColumnFilter",
+                "sortable": True,
+                "type": "numericColumn",
+                "width": 120,
+                "headerClass": "text-blue-600"
+            },
+            {
+                "field": "Damage",
+                "headerName": "Damage ($M)",
+                "filter": "agNumberColumnFilter",
+                "sortable": True,
+                "type": "numericColumn",
+                "width": 140,
+                "headerClass": "text-blue-600"
+            }
+        ]
 
     def simplify_location(self, location: str) -> str:
         """Simplify location string by taking only the first part before any comma or parenthesis.
-        Stopping locations like "Port-au-prince, Kenscoff municipalities (Port-au-Prince district),
-        Croix-des-Bouquets municipality..."
-        """
+        To avoid values over extending """
         if pd.isna(location):
             return ""
         parts = location.split(',')[0].split('(')[0].strip()
@@ -20,84 +70,60 @@ class DisasterTable:
             return parts[:27] + "..."
         return parts.strip()
 
-    def create_figure(self, filtered_data: pd.DataFrame = None) -> go.Figure:
-        """Create table figure from data"""
+
+    def prepare_table_data(self, filtered_data: pd.DataFrame = None) -> list:
+        """Prepare data for AG Grid table"""
         data_to_use = filtered_data if filtered_data is not None else self.data
 
-        # Process data: get worst disasters by total deaths
+        # Process data: get deadliest disasters
         worst_disasters = (data_to_use
             .sort_values('Total Deaths', ascending=False)
-            .head(10)
-            )
-        
-        # Prepare data for table with simplified location
-        table_data = {
-            'Year': worst_disasters['Start Year'],
-            'Type': worst_disasters['Disaster Type'],
-            'Country': worst_disasters['Country'],
-            'Location': worst_disasters['Location'].apply(self.simplify_location),
-            'Deaths': worst_disasters['Total Deaths'],
-            'Damage ($M)': worst_disasters['Total Damage'].apply(lambda x: x/1000 if x != 0 else pd.NA)
-        }
-
-        fig = go.Figure(data=[go.Table(
-            columnwidth=[50, 80, 100, 80, 70, 70], 
-            header=dict(
-                values=[f'<b>{col}</b>' for col in table_data.keys()],
-                font=dict(size=12, color='white'),
-                fill_color='rgb(0, 106, 178)',
-                align=['center'] * 6,
-                height=35
-            ),
-            cells=dict(
-                values=[table_data[k] for k in table_data.keys()],
-                font=dict(size=11),
-                align=['center'] * 6,
-                height=30,
-                fill_color=[['white', 'rgb(245, 249, 253)'] * len(worst_disasters)],
-                format=[None, None, None, None, ',', ',.0f']  # Number formatting
-            )
-        )])
-
-        fig.update_layout(
-            margin=dict(l=0, r=0, t=0, b=0),
-            height=400,
-            width=800,  # Fixed width to enable horizontal scroll
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            autosize=False,  # Disable autosize to enforce width
+            .head(50)
         )
-
-        return fig
+        
+        # Prepare data for table
+        return [
+            {
+                'Year': int(row['Start Year']),
+                'Type': row['Disaster Type'],
+                'Country': row['Country'],
+                'Location': self.simplify_location(row['Location']),
+                'Deaths': int(row['Total Deaths']) if pd.notna(row['Total Deaths']) else 0,
+                'Damage': float(row['Total Damage'])/1000 if pd.notna(row['Total Damage']) and row['Total Damage'] != 0 else None
+            }
+            for _, row in worst_disasters.iterrows()
+        ]
 
     def __call__(self):
-        fig = self.create_figure()
+        table_data = self.prepare_table_data()
         return html.Div([
-            dcc.Loading(
-                id="loading-table",
-                type="circle",
-                children=dcc.Graph(
-                    figure=fig,
-                    id="disaster-table",
-                    config={
-                        'displayModeBar': False,
-                        'scrollZoom': False
-                    },
-                    style={
-                        'width': '100%',
-                        'minWidth': '800px'  # Minimum width to match figure width
-                    }
-                )
+            dag.AgGrid(
+                id="disaster-table",
+                columnDefs=self.column_defs,
+                rowData=table_data,
+                columnSize="sizeToFit",
+                defaultColDef={
+                    "resizable": True,
+                    "sortable": True,
+                    "filter": True,
+                    "minWidth": 100
+                },
+                dashGridOptions={
+                    "pagination": True,
+                    "paginationAutoPageSize": True,
+                    "animateRows": True,
+                },
+                className="ag-theme-alpine",
+                style={"height": "500px", "width": "100%"}
             )
-        ], className="w-full overflow-x-auto")  # Enable horizontal scroll
-
+        ], className="w-full")
 
 def register_table_callbacks(app: Any, data: pd.DataFrame) -> None:
     """Register callbacks for the disaster table visualization."""
     table_viz = DisasterTable(data)
 
     @app.callback(
-        Output('disaster-table', 'figure'),
+        Output('disaster-table', 'rowData'),
         [
             Input('disaster-type-filter', 'value'),
             Input('region-filter', 'value'),
@@ -106,7 +132,7 @@ def register_table_callbacks(app: Any, data: pd.DataFrame) -> None:
         ]
     )
     def update_table(disaster_type: str, region: str, 
-                    start_year: int, end_year: int) -> Dict[str, Any]:
+                    start_year: int, end_year: int) -> list:
         filtered_data = data.copy()
 
         # Apply filters
@@ -119,4 +145,4 @@ def register_table_callbacks(app: Any, data: pd.DataFrame) -> None:
         if region and region != "All":
             filtered_data = filtered_data[filtered_data['Region'] == region]
 
-        return table_viz.create_figure(filtered_data)
+        return table_viz.prepare_table_data(filtered_data)
