@@ -6,29 +6,52 @@ import numpy as np
 import pandas as pd
 
 class Map:
-    def __init__(self, data, geojson):
+    def __init__(self, data, geojson, areas):
         self.data = data
         self.geojson = geojson
+        self.areas = areas
         
     def create_figure(self, filtered_data=None):
         """Create choropleth map figure from data"""
         data_to_use = filtered_data if filtered_data is not None else self.data
         
         counts_by_country = data_to_use.groupby(['ISO','Country']).size().reset_index(name='Disaster_Count')
-        counts_by_country['Scaled_Count'] = np.log10(counts_by_country['Disaster_Count'] + 1)
+
+        counts_by_country['Area'] = counts_by_country['ISO'].map(self.areas)
         
+        # Calculate disasters per 1000 km²
+        counts_by_country['Disaster_Density'] = (counts_by_country['Disaster_Count']) / counts_by_country['Area']
+
+        # Apply cube root transformation to amplify small differences
+        counts_by_country['Root_Density'] = np.cbrt(counts_by_country['Disaster_Density'])
+        
+        # Then apply min-max scaling on the transformed values
+        min_density = counts_by_country['Root_Density'].min()
+        max_density = counts_by_country['Root_Density'].max()
+        counts_by_country['Scaled_Density'] = (counts_by_country['Root_Density'] - min_density) / (max_density - min_density)      
+
         fig = go.Figure(go.Choroplethmapbox(
             geojson=self.geojson,
             locations=counts_by_country['ISO'],
-            z=counts_by_country['Scaled_Count'],
+            z=counts_by_country['Scaled_Density'],
             featureidkey="properties.ISO_A3", 
             colorscale="Viridis",
             marker_opacity=0.5,
             marker_line_width=0,
             hovertemplate="<b>%{customdata[1]}</b><br>" +
                          "Number of disasters: %{customdata[0]:,}<br>" +
+                         "Area: %{customdata[2]:,.2f} km²<br>" +
                          "Click for details<extra></extra>",
-            customdata=counts_by_country[['Disaster_Count','Country']].values
+            customdata=counts_by_country[['Disaster_Count','Country','Area']].values,
+            colorbar=dict(
+                tickmode="array",
+                thicknessmode="pixels",
+                thickness=20,
+                lenmode="pixels",
+                len=300,
+                xanchor="left",
+                x=0.01,
+            )
         ))
 
         fig.update_layout(
@@ -60,8 +83,8 @@ class Map:
             )
         ], className="w-full border-solid border-2")
 
-def register_map_callbacks(app, data, geojson):
-    map_viz = Map(data, geojson)
+def register_map_callbacks(app, data, geojson, areas):
+    map_viz = Map(data, geojson, areas)
     
     @app.callback(
         Output('map', 'figure'),

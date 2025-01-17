@@ -14,13 +14,11 @@ def get_project_paths() -> Dict[str, Path]:
         'raw': project_root / 'data' / 'raw',
         'clean': project_root / 'data' / 'clean',
         'geo_mapping': project_root / 'data' / 'geo_mapping',
+        'geojson_file': project_root / 'data' / 'geo_mapping' / 'countries.geojson',
+        'areas_file': project_root / 'data' / 'geo_mapping' / 'countries_area.csv', 
         'components': project_root / 'src' / 'components',
         'pages': project_root / 'src' / 'pages',
         'utils': project_root / 'src' / 'utils'
     }
-    
-    # Create directories if they don't exist
-    for path in paths.values():
-        path.mkdir(parents=True, exist_ok=True)
-        
+            
     return paths
