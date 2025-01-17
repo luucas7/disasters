@@ -47,9 +47,11 @@ def register_pie_callbacks(app, data):
         [Input('group-similar-disasters', 'value'),
         Input('show-other', 'value'), 
         Input('start-year-filter', 'value'),
-        Input('end-year-filter', 'value')]
+        Input('end-year-filter', 'value'),
+        Input('show-country', 'value'),     
+        Input('map', 'clickData')]
     )
-    def update_pie(group_similar, show_other, start_year, end_year):
+    def update_pie(group_similar, show_other, start_year, end_year, show_country, clickData):
         start_year = start_year if start_year is not None else data['Start Year'].min()
         end_year = end_year if end_year is not None else data['Start Year'].max()
         
@@ -58,6 +60,11 @@ def register_pie_callbacks(app, data):
             (data['Start Year'] <= end_year)
         ]
         
+        if show_country:
+            country_iso = clickData['points'][0]['location'] if clickData else None
+            if country_iso:
+                filtered_data = filtered_data[filtered_data['ISO'] == country_iso]
+            
         if group_similar and 'group' in group_similar:
             filtered_data = group_similar_disasters(filtered_data, True)
         

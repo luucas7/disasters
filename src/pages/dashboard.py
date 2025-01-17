@@ -35,6 +35,12 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
         value=["other"]
     )()
     
+    pie_chart_country_checkbox = Checkbox(
+        id="show-country",
+        options=[{"label": "Depending on the current country", "value": "country"}],
+        value=["country"]
+    )()
+    
     return html.Div([
         SideMenu(data)(),
                 
@@ -73,7 +79,7 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
                 # Pie chart
                 Card(
                     title="Disaster Type Distribution",
-                    filters=[pie_chart_group_checkbox, pie_chart_other_checkbox],
+                    filters=[pie_chart_group_checkbox, pie_chart_other_checkbox, pie_chart_country_checkbox],
                     caption="   Note : Although floods and storms are the most frequent disasters, earthquakes cause the most deaths. This difference can be explained by the sudden and unpredictable nature of earthquakes, making evacuation impossible, unlike floods and storms, which can often be anticipated thanks to weather forecasting systems.",
                     className='min-h-[900px]'
                 )(DisasterPieChart(data)())
