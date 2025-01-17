@@ -13,6 +13,7 @@ from src.graphics.timed_count import TimedCount, register_timed_count_callbacks
 from src.graphics.pie_chart import DisasterPieChart, register_pie_callbacks
 from src.graphics.statistics import Statistics, register_statistics_callbacks
 from src.graphics.country_details import CountryDetails, register_details_callbacks
+from src.graphics.disaster_table import DisasterTable, register_table_callbacks
 
 def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
     """Create the main dashboard layout."""
@@ -52,7 +53,10 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
                 Card(
                     title="Temporal Evolution of the number of disasters",
                     filters=[group_by_filter, impact_metric_filter]
-                )(TimedCount(data)())
+                )(TimedCount(data)()),
+
+                
+
             ], className="flex-1 flex flex-col gap-4"),
             
             # Right column - Secondary visualizations and stats
@@ -72,7 +76,14 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
                     title="Disaster Type Distribution",
                     filters=[pie_chart_group_checkbox, pie_chart_other_checkbox],
                     className='min-h-[900px]'
-                )(DisasterPieChart(data)())
+                )(DisasterPieChart(data)()),
+
+                # Table
+                Card(
+                    title="Deadliest disasters",
+                    filters=[]
+                )(DisasterTable(data)()),
+
             ], className="w-1/3 flex flex-col gap-4"),
 
         ], className="flex gap-4 p-4 ml-64 bg-gray-100 min-h-screen")
@@ -88,3 +99,4 @@ def init_callbacks(app: Any, data: Any, geojson: Dict[str, Any]) -> None:
     register_pie_callbacks(app, data)
     register_statistics_callbacks(app, data)
     register_details_callbacks(app, data)
+    register_table_callbacks(app, data)

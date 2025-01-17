@@ -64,7 +64,6 @@ class TimedCount:
             
         # Update layout
         fig.update_layout(
-        title=f"{y_title} by {(group_by).lower()} over time",
         xaxis_title="Year",
         yaxis_title=y_title,
         barmode='stack',
