@@ -16,15 +16,15 @@ class Card:
                 # Header avec style amélioré
                 html.Div(
                     [
-                        html.H3(self.title, className="text-lg font-semibold text-sage-800"),
+                        html.H3(self.title, className="text-lg font-semibold"),
                         html.Div(self.filters, className="flex flex-wrap gap-4 mt-3") if self.filters else None,
                     ],
-                    className="p-4 border-b border-sage-100",
+                    className="p-4 border-b",
                 )
                 if self.title or self.filters
                 else None,
                 # Card content
                 html.Div(children, className="p-4"),
             ],
-            className="bg-white rounded-lg shadow-sm border border-sage-50 hover:shadow-md transition-shadow duration-200 " + self.className,
+            className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow duration-200 " + self.className,
         )
