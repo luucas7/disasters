@@ -45,13 +45,15 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
                 # Map only
                 Card(
                     title="Number of disasters around the world",
-                    filters=[disaster_filter, region_filter]
+                    filters=[disaster_filter, region_filter],
+                    caption="   À retenir : Blablabla ihiehfids  dkfdjsksld"
                 )(Map(data, geojson)()),
                 
                 # Time series chart
                 Card(
                     title="Temporal Evolution of the number of disasters",
-                    filters=[group_by_filter, impact_metric_filter]
+                    filters=[group_by_filter, impact_metric_filter],
+                    caption= "   Note : The trend in the number of disasters shows significant peaks in certain years, notably in 2010 with the devastating earthquake in Haiti (see Total Deaths in Impact Metric). In recent years, there has been a slight downward trend in the total number of disasters recorded, although their human impact remains highly variable depending on the event."
                 )(TimedCount(data)())
             ], className="flex-1 flex flex-col gap-4"),
             
@@ -59,7 +61,8 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
             html.Div([
                 # Country details card
                 Card(
-                    title="Country Details"
+                    title="Country Details",
+                    caption="   Note : Exploring the data country by country, we discover very different profiles: the USA is mainly affected by storms and tornadoes, China records a high number of industrial accidents, while countries like Niger face recurrent epidemics. These differences reflect the specific vulnerabilities linked to each country's context: level of industrialization, healthcare system, or exposure to meteorological phenomena.",
                 )(CountryDetails(data)()),
                 
                 # Statistics card
@@ -71,6 +74,7 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
                 Card(
                     title="Disaster Type Distribution",
                     filters=[pie_chart_group_checkbox, pie_chart_other_checkbox],
+                    caption="   Note : Although floods and storms are the most frequent disasters, earthquakes cause the most deaths. This difference can be explained by the sudden and unpredictable nature of earthquakes, making evacuation impossible, unlike floods and storms, which can often be anticipated thanks to weather forecasting systems.",
                     className='min-h-[900px]'
                 )(DisasterPieChart(data)())
             ], className="w-1/3 flex flex-col gap-4"),

@@ -32,7 +32,11 @@ class Statistics:
                     initial_value=self.data['Total Affected'].sum() if self.data is not None else 0
                 ),
             ], id="stats-container", className="grid grid-cols-2 gap-4")
-        ], id="stats-wrapper", className="p-4 bg-white rounded-lg shadow-sm")
+        ], id="stats-wrapper", className="p-4 bg-white rounded-lg shadow-sm",
+         style={
+           'boxShadow': '0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)',
+           'WebkitBoxShadow': '0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)'  # Pour Chrome
+       })
 
     @staticmethod  
     def _create_stat_box(title: str, id_prefix: str, initial_value: float = 0) -> html.Div:
@@ -49,7 +53,11 @@ class Statistics:
                 ),
                 className="mt-1"
             )
-        ], className="p-4 bg-white rounded-lg shadow-sm border border-gray-100")
+        ], className="p-4 bg-white rounded-lg shadow-md border border-gray-300",
+        style={
+           'boxShadow': '0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)',
+           'WebkitBoxShadow': '0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)'  # Pour Chrome
+       })
 
     def __call__(self) -> html.Div:
         return self.layout
