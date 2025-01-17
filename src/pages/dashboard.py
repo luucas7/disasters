@@ -31,7 +31,7 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
 
     pie_chart_other_checkbox = Checkbox(
         id="show-other",
-        options=[{"label": "Show every categories", "value": "other"}],
+        options=[{"label": "Group smaller categories", "value": "other"}],
         value=["other"]
     )()
     
@@ -75,7 +75,7 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any]) -> html.Div:
                 )(DisasterPieChart(data)())
             ], className="w-1/3 flex flex-col gap-4"),
 
-        ], className="flex gap-4 p-4 ml-64 bg-gray-100 min-h-screen")
+        ], className="flex gap-4 p-4 ml-64 bg-gray-300 min-h-screen")
     ])
 
 def init_callbacks(app: Any, data: Any, geojson: Dict[str, Any]) -> None:

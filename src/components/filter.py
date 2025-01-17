@@ -12,13 +12,13 @@ class Filter:
         return html.Div([
             html.Label(
                 label,
-                className="block text-base font-medium text-sage-700 mb-2"
+                className="block text-base font-medium mb-2"
             ),
             dcc.Dropdown(
                 id=id,
                 options=options,
                 value=value,
-                className="rounded-md border-sage-200 focus:border-sage-500 focus:ring-sage-500",
+                className="rounded-md",
                 style={
                     'min-width': '230px'
                 },
