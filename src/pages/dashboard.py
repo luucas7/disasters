@@ -48,13 +48,13 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any], areas: Dict[str,
             html.Div([
                 # Map only
                 Card(
-                    title="Disaster Density by Country",
+                    title="Geographic distribution of disasters",
                     filters=[disaster_filter, region_filter, map_impact_metric_filter]
                 )(Map(data, geojson, areas)()),
                 
                 # Time series chart
                 Card(
-                    title="Temporal Evolution of the number of disasters",
+                    title="Disaster occurrences through time",
                     filters=[group_by_filter, temporal_impact_metric_filter]
                 )(TimedCount(data)()),
             ], className="flex-1 flex flex-col gap-4"),
@@ -63,17 +63,17 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any], areas: Dict[str,
             html.Div([
                 # Country details card
                 Card(
-                    title="Country Details"
+                    title="Country details"
                 )(CountryDetails(data)()),
                 
                 # Statistics card
                 Card(
-                    title="Database Statistics"
+                    title="Database statistics"
                 )(Statistics(data)()),
                 
                 # Pie chart
                 Card(
-                    title="Disaster Type Distribution",
+                    title="Disaster type distribution",
                     filters=[pie_chart_group_checkbox, pie_chart_other_checkbox],
                     className='min-h-[900px]'
                 )(DisasterPieChart(data)()),

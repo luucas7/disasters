@@ -5,3 +5,4 @@ pandas-stubs
 openpyxl==3.1.0
 requests
 selenium
+dash_ag_grid
