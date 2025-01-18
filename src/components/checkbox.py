@@ -1,5 +1,7 @@
-from dash import html, dcc
-from typing import List, Any, Callable
+from typing import List
+
+from dash import dcc, html
+
 
 class Checkbox:
     """Reusable checkbox component with consistent styling."""

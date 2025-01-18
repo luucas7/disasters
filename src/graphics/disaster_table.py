@@ -1,8 +1,10 @@
-import dash_ag_grid as dag
-from dash.dependencies import Input, Output
-from dash import html
 from typing import Any
+
+import dash_ag_grid as dag
 import pandas as pd
+from dash import html
+from dash.dependencies import Input, Output
+
 
 class DisasterTable:
     def __init__(self, data: pd.DataFrame):
@@ -14,7 +16,7 @@ class DisasterTable:
                 "filter": "agNumberColumnFilter",
                 "sortable": True,
                 "width": 100,
-                "headerClass": "text-blue-600"
+                "headerClass": "text-blue-600",
             },
             {
                 "field": "Type",
@@ -22,7 +24,7 @@ class DisasterTable:
                 "filter": True,
                 "sortable": True,
                 "width": 150,
-                "headerClass": "text-blue-600"
+                "headerClass": "text-blue-600",
             },
             {
                 "field": "Country",
@@ -30,7 +32,7 @@ class DisasterTable:
                 "filter": True,
                 "sortable": True,
                 "width": 140,
-                "headerClass": "text-blue-600"
+                "headerClass": "text-blue-600",
             },
             {
                 "field": "Location",
@@ -38,7 +40,7 @@ class DisasterTable:
                 "filter": True,
                 "sortable": True,
                 "width": 180,
-                "headerClass": "text-blue-600"
+                "headerClass": "text-blue-600",
             },
             {
                 "field": "Deaths",
@@ -47,7 +49,7 @@ class DisasterTable:
                 "sortable": True,
                 "type": "numericColumn",
                 "width": 120,
-                "headerClass": "text-blue-600"
+                "headerClass": "text-blue-600",
             },
             {
                 "field": "Damage",
@@ -56,93 +58,102 @@ class DisasterTable:
                 "sortable": True,
                 "type": "numericColumn",
                 "width": 140,
-                "headerClass": "text-blue-600"
-            }
+                "headerClass": "text-blue-600",
+            },
         ]
 
     def simplify_location(self, location: str) -> str:
         """Simplify location string by taking only the first part before any comma or parenthesis.
-        To avoid values over extending """
+        To avoid values over extending"""
         if pd.isna(location):
             return ""
-        parts = location.split(',')[0].split('(')[0].strip()
+        parts = location.split(",")[0].split("(")[0].strip()
         if len(parts) > 30:
             return parts[:27] + "..."
         return parts.strip()
-
 
     def prepare_table_data(self, filtered_data: pd.DataFrame = None) -> list:
         """Prepare data for AG Grid table"""
         data_to_use = filtered_data if filtered_data is not None else self.data
 
         # Process data: get deadliest disasters
-        worst_disasters = (data_to_use
-            .sort_values('Total Deaths', ascending=False)
-            .head(50)
+        worst_disasters = data_to_use.sort_values("Total Deaths", ascending=False).head(
+            50
         )
-        
+
         # Prepare data for table
         return [
             {
-                'Year': int(row['Start Year']),
-                'Type': row['Disaster Type'],
-                'Country': row['Country'],
-                'Location': self.simplify_location(row['Location']),
-                'Deaths': int(row['Total Deaths']) if pd.notna(row['Total Deaths']) else 0,
-                'Damage': float(row['Total Damage'])/1000 if pd.notna(row['Total Damage']) and row['Total Damage'] != 0 else None
+                "Year": int(row["Start Year"]),
+                "Type": row["Disaster Type"],
+                "Country": row["Country"],
+                "Location": self.simplify_location(row["Location"]),
+                "Deaths": int(row["Total Deaths"])
+                if pd.notna(row["Total Deaths"])
+                else 0,
+                "Damage": float(row["Total Damage"]) / 1000
+                if pd.notna(row["Total Damage"]) and row["Total Damage"] != 0
+                else None,
             }
             for _, row in worst_disasters.iterrows()
         ]
 
     def __call__(self):
         table_data = self.prepare_table_data()
-        return html.Div([
-            dag.AgGrid(
-                id="disaster-table",
-                columnDefs=self.column_defs,
-                rowData=table_data,
-                columnSize="sizeToFit",
-                defaultColDef={
-                    "resizable": True,
-                    "sortable": True,
-                    "filter": True,
-                    "minWidth": 100
-                },
-                dashGridOptions={
-                    "pagination": True,
-                    "paginationAutoPageSize": True,
-                    "animateRows": True,
-                },
-                className="ag-theme-alpine",
-                style={"height": "500px", "width": "100%"}
-            )
-        ], className="w-full")
+        return html.Div(
+            [
+                dag.AgGrid(
+                    id="disaster-table",
+                    columnDefs=self.column_defs,
+                    rowData=table_data,
+                    columnSize="sizeToFit",
+                    defaultColDef={
+                        "resizable": True,
+                        "sortable": True,
+                        "filter": True,
+                        "minWidth": 100,
+                    },
+                    dashGridOptions={
+                        "pagination": True,
+                        "paginationAutoPageSize": True,
+                        "animateRows": True,
+                    },
+                    className="ag-theme-alpine",
+                    style={"height": "500px", "width": "100%"},
+                )
+            ],
+            className="w-full",
+        )
+
 
 def register_table_callbacks(app: Any, data: pd.DataFrame) -> None:
     """Register callbacks for the disaster table visualization."""
     table_viz = DisasterTable(data)
 
     @app.callback(
-        Output('disaster-table', 'rowData'),
+        Output("disaster-table", "rowData"),
         [
-            Input('disaster-type-filter', 'value'),
-            Input('region-filter', 'value'),
-            Input('start-year-filter', 'value'),
-            Input('end-year-filter', 'value')
-        ]
+            Input("disaster-type-filter", "value"),
+            Input("region-filter", "value"),
+            Input("start-year-filter", "value"),
+            Input("end-year-filter", "value"),
+        ],
     )
-    def update_table(disaster_type: str, region: str, 
-                    start_year: int, end_year: int) -> list:
+    def update_table(
+        disaster_type: str, region: str, start_year: int, end_year: int
+    ) -> list:
         filtered_data = data.copy()
 
         # Apply filters
         if start_year is not None:
-            filtered_data = filtered_data[filtered_data['Start Year'] >= start_year]
+            filtered_data = filtered_data[filtered_data["Start Year"] >= start_year]
         if end_year is not None:
-            filtered_data = filtered_data[filtered_data['Start Year'] <= end_year]
+            filtered_data = filtered_data[filtered_data["Start Year"] <= end_year]
         if disaster_type and disaster_type != "All":
-            filtered_data = filtered_data[filtered_data['Disaster Type'] == disaster_type]
+            filtered_data = filtered_data[
+                filtered_data["Disaster Type"] == disaster_type
+            ]
         if region and region != "All":
-            filtered_data = filtered_data[filtered_data['Region'] == region]
+            filtered_data = filtered_data[filtered_data["Region"] == region]
 
         return table_viz.prepare_table_data(filtered_data)

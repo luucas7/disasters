@@ -1,5 +1,7 @@
-from dash import html, dcc
-from typing import Any, List, Dict
+from typing import Any, Dict, List
+
+from dash import dcc, html
+
 
 class Filter:
     """Collection of reusable filter components with enhanced styling."""

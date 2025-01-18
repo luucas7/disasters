@@ -1,7 +1,7 @@
 from dash import html
 from typing import List
-
-
+ 
+ 
 class Card:
     """Base card component with consistent styling."""
 
@@ -14,7 +14,7 @@ class Card:
     def __call__(self, children):
         return html.Div(
             [
-                # Header avec style amélioré
+                # Header avec style
                 html.Div(
                     [
                         html.H3(self.title, className="text-lg font-semibold"),

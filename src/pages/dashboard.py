@@ -1,19 +1,20 @@
-from dash import html, dcc
 from typing import Any, Dict
 
-from src.components.navbar import Navbar
-from src.components.filter import Filter
-from src.components.checkbox import Checkbox
-from src.components.side_menu import SideMenu
+from dash import html
+
 from src.components.card import Card
+from src.components.checkbox import Checkbox
+from src.components.filter import Filter
+from src.components.side_menu import SideMenu
+from src.graphics.country_details import CountryDetails, register_details_callbacks
+from src.graphics.disaster_table import DisasterTable, register_table_callbacks
 
 # Graphics components
 from src.graphics.map import Map, register_map_callbacks
-from src.graphics.timed_count import TimedCount, register_timed_count_callbacks
 from src.graphics.pie_chart import DisasterPieChart, register_pie_callbacks
 from src.graphics.statistics import Statistics, register_statistics_callbacks
-from src.graphics.country_details import CountryDetails, register_details_callbacks
-from src.graphics.disaster_table import DisasterTable, register_table_callbacks
+from src.graphics.timed_count import TimedCount, register_timed_count_callbacks
+
 
 def create_dashboard_layout(data: Any, geojson: Dict[str, Any], areas: Dict[str, float]) -> html.Div:
     """Create the main dashboard layout."""

@@ -1,5 +1,7 @@
-from dash import html, dcc
 from typing import Any
+
+from dash import dcc, html
+
 
 class SideMenu:
     """Side menu component for global year filters."""
