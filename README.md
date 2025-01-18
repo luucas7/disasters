@@ -96,6 +96,7 @@ graph TD
         D1 --> G2[timed_count.py]
         D1 --> G3[pie_chart.py]
         D1 --> G4[statistics.py]
+        D1 --> G5[disaster_table.py]
     end
 ```
 
