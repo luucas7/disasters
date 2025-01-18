@@ -5,7 +5,7 @@ from dash import html, Dash
 
 from src.components.checkbox import Checkbox
 from src.components.filter import Filter
-from src.components.side_menu import SideMenu
+from src.components.navbar import Navbar
 from src.components.card import Card, register_card_callback
 
 # Graphics components
@@ -49,7 +49,7 @@ def create_dashboard_layout(app: Dash, data: pd.DataFrame, geojson: Dict[str, An
     )()
     
     return html.Div([
-        SideMenu(data)(),
+        Navbar(data)(),
                 
         # Main content
         html.Div([
@@ -114,7 +114,7 @@ def create_dashboard_layout(app: Dash, data: pd.DataFrame, geojson: Dict[str, An
 
             ], className="w-1/3 flex flex-col gap-4"),
 
-        ], className="flex gap-4 p-4 ml-64 bg-gray-300 min-h-screen")
+        ], className="flex gap-4 p-4 mt-20 bg-gray-300 min-h-screen")
     ])
 
 def init_callbacks(app: Dash, data: pd.DataFrame, geojson: Dict[str, Any], areas: Dict[str, float]) -> None:
