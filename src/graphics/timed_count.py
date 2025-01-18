@@ -64,7 +64,6 @@ class TimedCount:
             
         # Update layout
         fig.update_layout(
-        title=f"{y_title} by {(group_by).lower()} over time",
         xaxis_title="Year",
         yaxis_title=y_title,
         barmode='stack',
@@ -94,7 +93,7 @@ def register_timed_count_callbacks(app, data):
             Input("start-year-filter", "value"),
             Input("end-year-filter", "value"),
             Input("group-by-filter", "value"),
-            Input("impact-metric-filter", "value"),
+            Input("temporal-impact-metric-filter", "value"),
         ],
     )
     def update_time_series(

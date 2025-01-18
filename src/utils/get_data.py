@@ -126,28 +126,54 @@ def process_data(data_path: Path, force_clean: bool = False, force_scrape: bool 
             "error": str(e)
         }
 
-def load_countries_geojson(geo_path: Path) -> Dict[str, Any]:
+
+def load_json_file(file_path: Path) -> Dict[str, Any]:
     """
     Load the countries GeoJSON data.
     
     Args:
-        geo_path: Path to the GeoJSON file
+        file_path: Path to the GeoJSON file
     """
-    try:
-        geojson_path = geo_path / "countries.geojson"
-        
-        with open(geojson_path, 'r') as f:
+    try:        
+        with open(file_path, 'r') as f:
             geojson = json.load(f)
         
         return geojson
         
     except FileNotFoundError:
-        logger.error(f"GeoJSON file not found in {geo_path}")
+        logger.error(f"GeoJSON file not found in {file_path}")
         return None
     except Exception as e:
         logger.error(f"Error reading GeoJSON file: {e}")
         return None
+
+
+def load_areas_file(file_path: Path) -> Dict[str, float]:
+    """
+    Load the countries areas data into a dictionary.
     
+    Args:
+        file_path: Path to the areas CSV file
+        
+    Returns:
+        Dictionary mapping ISO codes to country areas
+    """
+    try:
+        areas_df = pd.read_csv(file_path)
+        
+        # Convertir le DataFrame en dictionnaire avec ISO comme clé
+        areas_dict = areas_df.set_index('ISO')['Area'].to_dict()
+        
+        return areas_dict
+        
+    except FileNotFoundError:
+        logger.error(f"Areas file not found in {file_path}")
+        return None
+    except Exception as e:
+        logger.error(f"Error reading areas file: {e}")
+        return None
+    
+
 def download_from_site(url: str, username: str, password: str, download_path: str, filename: str) -> None:
     """
     Download data file from EMDAT website using Selenium.

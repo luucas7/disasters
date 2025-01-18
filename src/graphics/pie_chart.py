@@ -76,12 +76,14 @@ def register_pie_callbacks(app, data):
                 others_sum = counts[other_mask].sum()
                 counts = counts[~other_mask]
                 counts['Others'] = others_sum
+
+        text_infos = 'percent' if show_other else 'none'
         
         pie_fig = go.Figure(
             data=[go.Pie(
                 labels=counts.index,
                 values=counts.values,
-                textinfo='none',
+                textinfo=text_infos,
                 showlegend=True,
                 textposition='auto',
                 hole=0.4,
