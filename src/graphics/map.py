@@ -1,14 +1,14 @@
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output
-from dash import dcc, html
+from dash import dcc, html, Dash
 import numpy as np
 
 import pandas as pd
 
-import dash
-
 
 class Map:
+    """Choropleth map visualization component."""
+    
     def __init__(self, data: pd.DataFrame, geojson: dict, areas: dict):
         self.data = data
         self.geojson = geojson
@@ -94,8 +94,10 @@ class Map:
                     id="loading-map",
                     type="circle",
                     children=dcc.Graph(
+                        responsive=True,
                         figure=fig,
                         id="map",
+                        style={'height': '450px'},
                         config={
                             "doubleClick": "reset+autosize",
                             "scrollZoom": True,
@@ -108,7 +110,7 @@ class Map:
         )
 
 
-def register_map_callbacks(app: dash, data: pd.DataFrame, geojson: dict, areas: dict) -> None:
+def register_map_callbacks(app: Dash, data: pd.DataFrame, geojson: dict, areas: dict) -> None:
     map_viz = Map(data, geojson, areas)
 
     @app.callback(

@@ -33,7 +33,7 @@ class Navbar:
                             ),
                             html.A(
                                 [html.I(className="fab fa-github mr-2"), "Source Code"],
-                                href="https://github.com/hyprra/disasters",
+                                href="https://github.com/luucas7/disasters",
                                 className="text-white hover:text-gray-300 px-3 py-2 flex items-center",
                                 target="_blank",
                             ),

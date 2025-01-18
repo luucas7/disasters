@@ -1,21 +1,3 @@
-COUNTRIES_MAPPING = {
-    "Iran (Islamic Republic of)": "Iran",
-    "United States": "United States of America",
-    "Venezuela (Bolivarian Republic of)": "Venezuela",
-    "China, Hong Kong Special Administrative Region": "China",
-    "Taiwan (Province of China)": "Taiwan",
-    "State of Palestine": "Palestine",
-    "Serbia Montenegro": "Serbia",
-    "Czechia": "Czech Republic",
-    "Syrian Arab Republic": "Syria",
-    "Türkiye": "Turkey",
-    "Democratic People's Republic of Korea": "North Korea",
-    "Republic of Korea": "South Korea",
-    "Viet Nam": "Vietnam",
-    "Lao People's Democratic Republic": "Laos",
-    "Bolivia (Plurinational State of)": "Bolivia",
-}
-
 ISO_TO_COUNTRY = {
     "AFG": "Afghanistan",
     "ALB": "Albania",

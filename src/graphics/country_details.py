@@ -1,8 +1,7 @@
 from typing import Optional
 
-import dash
 import pandas as pd
-from dash import html
+from dash import Dash, html
 from dash.dependencies import Input, Output
 
 
@@ -105,7 +104,7 @@ class CountryDetails:
         return html.Div(id="country-details-content", className="h-full")
 
 
-def register_details_callbacks(app: dash, data: pd.DataFrame) -> None:
+def register_details_callbacks(app: Dash, data: pd.DataFrame) -> None:
     """Register callbacks for the details card."""
 
     @app.callback(

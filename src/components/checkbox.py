@@ -23,6 +23,6 @@ class Checkbox:
                 className="space-y-2",
                 inputClassName="w-4 h-4 mr-2 text-blue-600 border-gray-300 rounded focus:ring-blue-500",
                 labelClassName="text-sm text-gray-700",
-                labelStyle={"display": "flex", "align-items": "center"}
+                labelStyle={"display": "flex", "alignItems": "center"}
             )
         ], className="mb-4")

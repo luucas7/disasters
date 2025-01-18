@@ -59,7 +59,7 @@ def initialize_app(force_clean: bool = False, force_scrape: bool = False) -> das
     )
 
     # Set up layout
-    app.layout = create_dashboard_layout(data, geojson, areas)
+    app.layout = create_dashboard_layout(app, data, geojson, areas)
 
     # Initialize callbacks
     init_callbacks(app, data, geojson, areas)

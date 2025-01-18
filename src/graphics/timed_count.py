@@ -1,9 +1,8 @@
 from typing import Any, Dict
 
-import dash
 import pandas as pd
 import plotly.graph_objects as go
-from dash import dcc, html
+from dash import dcc, html, Dash
 from dash.dependencies import Input, Output
 
 
@@ -15,6 +14,7 @@ class TimedCount:
         self.layout = html.Div(
             [
                 dcc.Graph(
+                    responsive=True,
                     id="time-series-chart",
                     style={"width": "95%"},
                     config={
@@ -98,7 +98,7 @@ class TimedCount:
         return self.layout
 
 
-def register_timed_count_callbacks(app: dash, data: pd.DataFrame) -> None:
+def register_timed_count_callbacks(app: Dash, data: pd.DataFrame) -> None:
     @app.callback(
         Output("time-series-chart", "figure"),
         [

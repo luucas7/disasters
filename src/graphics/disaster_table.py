@@ -7,6 +7,8 @@ from dash.dependencies import Input, Output
 
 
 class DisasterTable:
+    """Disaster table visualization component."""
+    
     def __init__(self, data: pd.DataFrame):
         self.data = data
         self.column_defs = [
@@ -66,7 +68,7 @@ class DisasterTable:
         """Simplify location string by taking only the first part before any comma or parenthesis.
         To avoid values over extending"""
         if pd.isna(location):
-            return ""
+            return "" # type: ignore[unreachable]
         parts = location.split(",")[0].split("(")[0].strip()
         if len(parts) > 30:
             return parts[:27] + "..."
@@ -117,6 +119,7 @@ class DisasterTable:
                         "pagination": True,
                         "paginationAutoPageSize": True,
                         "animateRows": True,
+                        "domLayout": 'autoWidth',
                     },
                     className="ag-theme-alpine",
                     style={"height": "500px", "width": "100%"},
@@ -133,14 +136,12 @@ def register_table_callbacks(app: Any, data: pd.DataFrame) -> None:
     @app.callback(
         Output("disaster-table", "rowData"),
         [
-            Input("disaster-type-filter", "value"),
-            Input("region-filter", "value"),
             Input("start-year-filter", "value"),
             Input("end-year-filter", "value"),
         ],
     )
     def update_table(
-        disaster_type: str, region: str, start_year: int, end_year: int
+        start_year: int, end_year: int
     ) -> list[dict[str, Any]]:
         filtered_data = data.copy()
 
@@ -149,11 +150,5 @@ def register_table_callbacks(app: Any, data: pd.DataFrame) -> None:
             filtered_data = filtered_data[filtered_data["Start Year"] >= start_year]
         if end_year is not None:
             filtered_data = filtered_data[filtered_data["Start Year"] <= end_year]
-        if disaster_type and disaster_type != "All":
-            filtered_data = filtered_data[
-                filtered_data["Disaster Type"] == disaster_type
-            ]
-        if region and region != "All":
-            filtered_data = filtered_data[filtered_data["Region"] == region]
 
         return table_viz.prepare_table_data(filtered_data)
