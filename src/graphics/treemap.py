@@ -18,6 +18,7 @@ class DisasterTreemap:
                 type="circle",  
                 children=dcc.Graph(
                     id='disaster-treemap',
+                    responsive=True,
                     style={'height': '600px'},
                     config={
                         'displayModeBar': False,
