@@ -5,7 +5,6 @@ from dash import html, Dash
 
 from src.components.checkbox import Checkbox
 from src.components.filter import Filter
-from src.components.fullscreen_card import FullscreenCard, register_fullscreen_callbacks
 from src.components.side_menu import SideMenu
 from src.components.card import Card
 
@@ -110,4 +109,3 @@ def init_callbacks(app: Dash, data: pd.DataFrame, geojson: Dict[str, Any], areas
     register_statistics_callbacks(app, data)
     register_details_callbacks(app, data)
     register_table_callbacks(app, data)
-    register_fullscreen_callbacks(app)
