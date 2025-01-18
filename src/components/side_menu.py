@@ -1,6 +1,6 @@
 from typing import Any
 
-from dash import dcc, html
+from dash import dcc, html, Input, Output, State
 
 
 class SideMenu:
@@ -37,6 +37,7 @@ class SideMenu:
                         id="start-year-filter",
                         options=self._get_year_options(),
                         value=min_year,
+                        clearable=False,
                         className="mt-1 rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500",
                     ),
                 ], className="mb-4"),
@@ -51,6 +52,7 @@ class SideMenu:
                         id="end-year-filter",
                         options=self._get_year_options(),
                         value=max_year,
+                        clearable=False,
                         className="mt-1 rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500",
                     ),
                 ], className="mb-4"),
@@ -67,3 +69,21 @@ class SideMenu:
         
     def __call__(self) -> html.Div:
         return self.layout
+    
+def register_side_menu_callbacks(app, data):
+    @app.callback(
+        [Output('start-year-filter', 'value'),
+            Output('end-year-filter', 'value')],
+        [Input('start-year-filter', 'value'),
+            Input('end-year-filter', 'value')],
+        [State('start-year-filter', 'options'),
+            State('end-year-filter', 'options')]
+    )
+    def update_year_dropdowns(start_year, end_year, start_options, end_options):
+        if start_year is not None and end_year is not None:
+            if start_year > end_year:
+                temp = start_year
+                start_year = min(start_year, end_year)
+                end_year = max(temp, end_year)
+
+        return start_year, end_year

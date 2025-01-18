@@ -27,7 +27,7 @@ class Filter:
                 },
                 placeholder=f"Select {label.lower()}...",
             ),
-        ], className="mb-6 relative group")  # group pour interactions
+        ], className="relative group")  # group pour interactions
     
     def disaster_filter(self, id: str) -> html.Div:
         """Create a disaster type filter dropdown."""
