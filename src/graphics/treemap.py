@@ -1,13 +1,15 @@
-import plotly.graph_objects as go
-from dash import html, dcc
-from dash.dependencies import Input, Output
+from typing import Any, Dict
+
 import pandas as pd
-from typing import Dict, Any
+import plotly.graph_objects as go
+from dash import dcc, html
+from dash.dependencies import Input, Output
+
 
 class DisasterTreemap:
     """Treemap visualization component showing disaster impact by country."""
     
-    def __init__(self, data: pd.DataFrame = None):
+    def __init__(self, data: pd.DataFrame):
         """Initialize the treemap component."""
         self.data = data
         self.layout = html.Div([
@@ -129,7 +131,7 @@ class DisasterTreemap:
                 showarrow=False
             )
 
-    def __call__(self):
+    def __call__(self) -> html.Div:
         """Render the component."""
         return self.layout
 
