@@ -97,6 +97,7 @@ graph TD
         D1 --> G3[pie_chart.py]
         D1 --> G4[statistics.py]
         D1 --> G5[disaster_table.py]
+        D1 --> G6[treemap.py]
     end
 ```
 
@@ -150,6 +151,19 @@ classDiagram
         -layout
         +__call__()
         -_create_layout()
+    }
+    class DisasterTreemap {
+        -data
+        -layout
+        +__call__()
+        -_create_layout()
+    }
+    class DisasterTreemap {
+        -data
+        -layout
+        -simplify_location()
+        -prepare_table_data()
+        +__call__()
     }
     class EMDATCleaner {
         -df
