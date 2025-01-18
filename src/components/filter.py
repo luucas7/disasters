@@ -37,6 +37,16 @@ class Filter:
             options=self._get_disaster_options(),
             value="All"
         )
+        
+    def disaster_filter_without_all(self, id: str) -> html.Div:
+        """Create a disaster type filter dropdown without 'All' option."""
+        options = self._get_disaster_options(include_all=False)
+        return self.dropdown_filter(
+            id=id,
+            label="Disaster Type",
+            options=options,
+            value=options[0]["value"] if options else None
+        )
 
     def region_filter(self, id: str) -> html.Div:
         """Create a region filter dropdown."""
@@ -88,12 +98,13 @@ class Filter:
             value="Density"
         )
 
-    def _get_disaster_options(self) -> List[Dict[str, str]]:
+    def _get_disaster_options(self, include_all: bool = True) -> List[Dict[str, str]]:
         if self.data is not None:
             disasters = sorted(self.data["Disaster Type"].unique())
-            return [{"label": "All", "value": "All"}] + [
-                {"label": disaster, "value": disaster} for disaster in disasters
-            ]
+            options = [{"label": disaster, "value": disaster} for disaster in disasters]
+            if include_all:
+                options.insert(0, {"label": "All", "value": "All"})
+            return options
         return []
 
     def _get_region_options(self) -> List[Dict[str, str]]:
