@@ -59,7 +59,7 @@ def register_card_callback(app: Dash, id: str) -> None:
     )
     def toggle_card_fullscreen(n_clicks: Optional[int], current_className: str) -> tuple:
         if n_clicks is None:
-            return current_className, "/assets/maximize.svg"  # type: ignore[unreachable]
+            return current_className, "/assets/maximize.svg"
             
         if n_clicks % 2 == 1:  # Expand
             new_class_name = current_className + " fixed inset-4 z-50 overflow-auto w-[calc(100%-2rem)]"
