@@ -1,6 +1,6 @@
 from dash import html
 from typing import List
-
+ 
 
 class Card:
     """Base card component with consistent styling."""
@@ -11,15 +11,15 @@ class Card:
         self.filters = filters
         self.className = className
 
-    def __call__(self, children):
+    def __call__(self, children: List[html.Div]) -> html.Div:
         return html.Div(
             [
-                # Header avec style amélioré
+                # Header avec style
                 html.Div(
                     [
                         html.H3(self.title, className="text-lg font-semibold"),
-                        html.P(self.caption, className="text-sm text-gray-500 italic ml-5") if self.caption else None,
-                        html.Div(self.filters, className="flex flex-wrap gap-4 mt-3") if self.filters else None,
+                        html.P(self.caption, className="text-sm text-gray-500 italic ml-5 mt-2 mb-2") if self.caption else None,
+                        html.Div(self.filters, className="flex flex-wrap gap-4 mt-4") if self.filters else None,
                     ],
                     className="p-4 border-b border-gray-300",
                 )

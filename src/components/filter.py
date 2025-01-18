@@ -1,5 +1,7 @@
-from dash import html, dcc
-from typing import Any, List, Dict
+from typing import Any, Dict, List
+
+from dash import dcc, html
+
 
 class Filter:
     """Collection of reusable filter components with enhanced styling."""
@@ -27,7 +29,7 @@ class Filter:
             ),
         ], className="mb-6 relative group")  # group pour interactions
     
-    def disaster_filter(self, id):
+    def disaster_filter(self, id: str) -> html.Div:
         """Create a disaster type filter dropdown."""
         return self.dropdown_filter(
             id=id,
@@ -36,7 +38,7 @@ class Filter:
             value="All"
         )
 
-    def region_filter(self, id):
+    def region_filter(self, id: str) -> html.Div:
         """Create a region filter dropdown."""
         return self.dropdown_filter(
             id=id,
@@ -45,7 +47,7 @@ class Filter:
             value="All"
         )
 
-    def group_by_filter(self, id):
+    def group_by_filter(self, id: str) -> html.Div:
         """Create a group by filter dropdown."""
         return self.dropdown_filter(
             id=id,
@@ -58,7 +60,7 @@ class Filter:
             value="Region"
         )
 
-    def temporal_impact_metric_filter(self, id):
+    def temporal_impact_metric_filter(self, id: str) -> html.Div:
         """Create an impact metric filter dropdown."""
         return self.dropdown_filter(
             id=id,
@@ -74,7 +76,7 @@ class Filter:
             value="count"
         )
     
-    def map_impact_metric_filter(self, id):
+    def map_impact_metric_filter(self, id: str) -> html.Div:
         """Create an impact metric filter dropdown."""
         return self.dropdown_filter(
             id=id,
@@ -86,7 +88,7 @@ class Filter:
             value="Density"
         )
 
-    def _get_disaster_options(self):
+    def _get_disaster_options(self) -> List[Dict[str, str]]:
         if self.data is not None:
             disasters = sorted(self.data["Disaster Type"].unique())
             return [{"label": "All", "value": "All"}] + [
@@ -94,7 +96,7 @@ class Filter:
             ]
         return []
 
-    def _get_region_options(self):
+    def _get_region_options(self) -> List[Dict[str, str]]:
         if self.data is not None:
             regions = sorted(self.data["Region"].unique())
             return [{"label": "All", "value": "All"}] + [
