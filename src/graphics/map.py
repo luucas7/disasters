@@ -1,11 +1,9 @@
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output
-from dash import dcc, html
+from dash import dcc, html, Dash
 import numpy as np
 
 import pandas as pd
-
-import dash
 
 
 class Map:
@@ -110,7 +108,7 @@ class Map:
         )
 
 
-def register_map_callbacks(app: dash, data: pd.DataFrame, geojson: dict, areas: dict) -> None:
+def register_map_callbacks(app: Dash, data: pd.DataFrame, geojson: dict, areas: dict) -> None:
     map_viz = Map(data, geojson, areas)
 
     @app.callback(
