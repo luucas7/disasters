@@ -79,11 +79,10 @@ graph TD
     B --> D[pages/]
     B --> E[utils/]
     
-    C --> C1[navbar.py]
-    C --> C2[side_menu.py]
-    C --> C3[filter.py]
-    C --> C4[checkbox.py]
-    C --> C5[card.py]
+    C --> C1[side_menu.py]
+    C --> C2[filter.py]
+    C --> C3[checkbox.py]
+    C --> C4[card.py]
     
     D --> D1[dashboard.py]
     
