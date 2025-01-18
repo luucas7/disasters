@@ -25,4 +25,4 @@ class Checkbox:
                 labelClassName="text-sm text-gray-700",
                 labelStyle={"display": "flex", "alignItems": "center"}
             )
-        ], className="mb-4")
+        ], className="mb-2")

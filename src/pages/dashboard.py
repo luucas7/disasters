@@ -42,7 +42,7 @@ def create_dashboard_layout(app: Dash, data: pd.DataFrame, geojson: Dict[str, An
 
     pie_chart_group_checkbox = Checkbox(
         id="group-similar-disasters",
-        options=[{"label": "Group Similar Disasters", "value": "group"}],
+        options=[{"label": "Group similar disasters", "value": "group"}],
         value=["group"]
     )()
 
@@ -58,6 +58,7 @@ def create_dashboard_layout(app: Dash, data: pd.DataFrame, geojson: Dict[str, An
         value=["country"]
     )()
     
+    # Create the main layout
     return html.Div([
         # Side menu component
         SideMenu(data)(),
