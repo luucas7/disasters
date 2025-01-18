@@ -7,6 +7,7 @@ from dash.dependencies import Input, Output
 
 
 def group_similar_disasters(data: Any, group: bool = False) -> Any:
+    """Help function to group similar disaster types together. """
     if not group:
         return data
 

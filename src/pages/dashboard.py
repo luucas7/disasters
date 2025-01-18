@@ -18,7 +18,6 @@ from src.graphics.timed_count import TimedCount, register_timed_count_callbacks
 
 def create_dashboard_layout(data: Any, geojson: Dict[str, Any], areas: Dict[str, float]) -> html.Div:
     """Create the main dashboard layout."""
-    
     filters = Filter(data)
     disaster_filter = filters.disaster_filter("disaster-type-filter")
     region_filter = filters.region_filter("region-filter")
@@ -26,8 +25,6 @@ def create_dashboard_layout(data: Any, geojson: Dict[str, Any], areas: Dict[str,
     temporal_impact_metric_filter = filters.temporal_impact_metric_filter("temporal-impact-metric-filter")
     map_impact_metric_filter = filters.map_impact_metric_filter("map-impact-metric-filter")
 
-
-    
     pie_chart_group_checkbox = Checkbox(
         id="group-similar-disasters",
         options=[{"label": "Group Similar Disasters", "value": "group"}],
