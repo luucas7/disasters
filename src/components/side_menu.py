@@ -37,7 +37,7 @@ class SideMenu:
                         id="start-year-filter",
                         options=self._get_year_options(),
                         value=min_year,
-                        className="mt-1",
+                        className="mt-1 rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500",
                     ),
                 ], className="mb-4"),
                 
@@ -51,7 +51,7 @@ class SideMenu:
                         id="end-year-filter",
                         options=self._get_year_options(),
                         value=max_year,
-                        className="mt-1",
+                        className="mt-1 rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500",
                     ),
                 ], className="mb-4"),
             ], className="p-4")

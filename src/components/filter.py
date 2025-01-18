@@ -21,11 +21,11 @@ class Filter:
                 options=options,
                 clearable=False,
                 value=value,
-                className="rounded-md",
+                className="rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500",
                 style={
-                    'min-width': '230px'
+                    'minWidth': '230px'
                 },
-                placeholder=f"Select {label.lower()}..."
+                placeholder=f"Select {label.lower()}...",
             ),
         ], className="mb-6 relative group")  # group pour interactions
     
