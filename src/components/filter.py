@@ -27,7 +27,7 @@ class Filter:
                 },
                 placeholder=f"Select {label.lower()}...",
             ),
-        ], className="relative group")  # group pour interactions
+        ], className="relative group") # Add group class for focus styles
     
     def disaster_filter(self, id: str) -> html.Div:
         """Create a disaster type filter dropdown."""
@@ -99,6 +99,11 @@ class Filter:
         )
 
     def _get_disaster_options(self, include_all: bool = True) -> List[Dict[str, str]]:
+        """Get the list of disaster type options from the data.
+        
+        Returns:
+            A list of dictionaries containing the disaster type options.
+        """
         if self.data is not None:
             disasters = sorted(self.data["Disaster Type"].unique())
             options = [{"label": disaster, "value": disaster} for disaster in disasters]
@@ -108,6 +113,11 @@ class Filter:
         return []
 
     def _get_region_options(self) -> List[Dict[str, str]]:
+        """Get the list of region options from the data.
+        
+        Returns:
+            A list of dictionaries containing the region options.
+        """
         if self.data is not None:
             regions = sorted(self.data["Region"].unique())
             return [{"label": "All", "value": "All"}] + [

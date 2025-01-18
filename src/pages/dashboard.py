@@ -59,6 +59,7 @@ def create_dashboard_layout(app: Dash, data: pd.DataFrame, geojson: Dict[str, An
     )()
     
     return html.Div([
+        # Side menu component
         SideMenu(data)(),
                 
         # Main content
