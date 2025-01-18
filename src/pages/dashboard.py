@@ -73,6 +73,7 @@ def create_dashboard_layout(app: Dash, data: pd.DataFrame, geojson: Dict[str, An
                 
                 # Treemap
                 Card(
+                    id="treemap-card",
                     title="Disaster impact by region",
                     filters=[disaster_filter_without_all, treemap_region_filter, treemap_impact_metric_filter],
                     caption="   Note: The treemap reveals specific geographical vulnerabilities: China and the Philippines are particularly hard hit by floods, Japan and Indonesia by earthquakes, while the USA is more affected by storms. These differences reflect the specific vulnerabilities linked to each country's context: level of industrialization, healthcare system, or exposure to meteorological phenomena."
@@ -129,5 +130,5 @@ def init_callbacks(app: Dash, data: pd.DataFrame, geojson: Dict[str, Any], areas
     register_table_callbacks(app, data)
     register_treemap_callbacks(app, data)
 
-    for id in ["map-card", "temporal-card", "details-card", "stats-card", "pie-card", "table-card"]:
+    for id in ["map-card", "temporal-card", "details-card", "stats-card", "pie-card", "table-card", "treemap-card"]:
         register_card_callback(app, id)
