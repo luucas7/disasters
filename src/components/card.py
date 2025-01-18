@@ -5,8 +5,9 @@ from typing import List
 class Card:
     """Base card component with consistent styling."""
 
-    def __init__(self, title: str = "", filters: List = [], className: str = ""):
+    def __init__(self, title: str = "", caption: str="", filters: List = [], className: str = ""):
         self.title = title
+        self.caption = caption
         self.filters = filters
         self.className = className
 
@@ -16,15 +17,16 @@ class Card:
                 # Header avec style amélioré
                 html.Div(
                     [
-                        html.H3(self.title, className="text-lg font-semibold text-sage-800"),
+                        html.H3(self.title, className="text-lg font-semibold"),
+                        html.P(self.caption, className="text-sm text-gray-500 italic ml-5") if self.caption else None,
                         html.Div(self.filters, className="flex flex-wrap gap-4 mt-3") if self.filters else None,
                     ],
-                    className="p-4 border-b border-sage-100",
+                    className="p-4 border-b border-gray-300",
                 )
-                if self.title or self.filters
+                if self.title
                 else None,
                 # Card content
                 html.Div(children, className="p-4"),
             ],
-            className="bg-white rounded-lg shadow-sm border border-sage-50 hover:shadow-md transition-shadow duration-200 " + self.className,
+            className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow duration-200 " + self.className,
         )
