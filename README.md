@@ -55,7 +55,7 @@ http://127.0.0.1:8050/
 
 ## Data
 
-This project uses EM-DAT data which includes:
+This project uses [EM-DAT](https://public.emdat.be/) data which includes:
 
 - Global disaster events
 - Type, location, and timing of events
@@ -64,8 +64,9 @@ This project uses EM-DAT data which includes:
 
 Data organization:
 - `data/raw/`: Raw data
-- `data/cleaned/`: Cleaned data
-- `data/geo_mapping/`: Geographic data (Countries GeoJSON)
+- `data/cleaned/cleaned_disasters.csv`: Cleaned data, in .csv format
+- `data/geo_mapping/countries_area.csv`: Country areas, for density ([Countries area](https://restcountries.com/))
+- `data/geo_mapping/countries.geojson`: Geographic data ([Countries GeoJSON](https://github.com/datasets/geo-countries/blob/main/data/countries.geojson))
 
 ## Developer Guide
 
