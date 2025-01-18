@@ -2,6 +2,14 @@
 
 An interactive dashboard for analyzing and visualizing global data on natural and technological disasters, based on the [EM-DAT](https://public.emdat.be/) database.
 
+## Prerequisites
+
+- Python 3.10 or higher
+- Git
+- Web browser
+- (Optional) EM-DAT account credentials if you want to fetch fresh data
+- At least 100MB of free disk space for data files
+
 # User Guide
 
 ### Installation and Deployment
