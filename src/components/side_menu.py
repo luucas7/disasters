@@ -1,6 +1,7 @@
 from typing import Any
 
-from dash import dcc, html, Input, Output, State
+import pandas as pd
+from dash import Dash, Input, Output, dcc, html
 
 
 class SideMenu:
@@ -70,20 +71,15 @@ class SideMenu:
     def __call__(self) -> html.Div:
         return self.layout
     
-def register_side_menu_callbacks(app, data):
+def register_side_menu_callbacks(app: Dash, data: pd.DataFrame) -> None:
     @app.callback(
         [Output('start-year-filter', 'value'),
-            Output('end-year-filter', 'value')],
+         Output('end-year-filter', 'value')],
         [Input('start-year-filter', 'value'),
-            Input('end-year-filter', 'value')],
-        [State('start-year-filter', 'options'),
-            State('end-year-filter', 'options')]
+         Input('end-year-filter', 'value')]
     )
-    def update_year_dropdowns(start_year, end_year, start_options, end_options):
+    def update_year_dropdowns(start_year: int, end_year: int) -> tuple:
         if start_year is not None and end_year is not None:
             if start_year > end_year:
-                temp = start_year
-                start_year = min(start_year, end_year)
-                end_year = max(temp, end_year)
-
+                return end_year, start_year
         return start_year, end_year

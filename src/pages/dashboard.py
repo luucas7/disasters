@@ -1,13 +1,12 @@
 from typing import Any, Dict
 
 import pandas as pd
-from dash import html, Dash
+from dash import Dash, html
 
+from src.components.card import Card, register_card_callback
 from src.components.checkbox import Checkbox
 from src.components.filter import Filter
-from src.components.side_menu import SideMenu
-from src.components.card import Card, register_card_callback
-from src.components.side_menu import register_side_menu_callbacks
+from src.components.side_menu import SideMenu, register_side_menu_callbacks
 
 # Graphics components
 from src.graphics.country_details import CountryDetails, register_details_callbacks
@@ -20,13 +19,14 @@ from src.graphics.treemap import DisasterTreemap, register_treemap_callbacks
 
 # Import resource strings
 from src.utils.resources import (
+    DETAILS_CARD_CAPTION,
     MAP_CARD_CAPTION,
+    PIE_CARD_CAPTION,
+    TABLE_CARD_CAPTION,
     TEMPORAL_CARD_CAPTION,
     TREEMAP_CARD_CAPTION,
-    DETAILS_CARD_CAPTION,
-    PIE_CARD_CAPTION,
-    TABLE_CARD_CAPTION
 )
+
 
 def create_dashboard_layout(app: Dash, data: pd.DataFrame, geojson: Dict[str, Any], areas: Dict[str, float]) -> html.Div:
     """Create the main dashboard layout."""

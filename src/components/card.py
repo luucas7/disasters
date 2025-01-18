@@ -1,6 +1,8 @@
-from dash import html, Dash
 from typing import List, Optional
+
+from dash import Dash, html
 from dash.dependencies import Input, Output, State
+
 
 class Card:
     """Base card component with consistent styling and fullscreen capability."""
