@@ -1,12 +1,14 @@
-from typing import Any, List, Optional
+from typing import Any
+
 import dash_ag_grid as dag
 import pandas as pd
-from dash import html, dcc
-from dash.dependencies import Input, Output, State
+from dash import html
+from dash.dependencies import Input, Output
+
 
 class DisasterTable:
     """Disaster table visualization component."""
-    
+
     def __init__(self, data: pd.DataFrame):
         self.data = data
         self.column_defs = [
@@ -15,7 +17,7 @@ class DisasterTable:
                 "headerName": "Year",
                 "filter": "agNumberColumnFilter",
                 "sortable": True,
-                "minWidth":  80
+                "minWidth": 80,
             },
             {
                 "field": "Type",
@@ -114,7 +116,7 @@ class DisasterTable:
                         "pagination": True,
                         "paginationAutoPageSize": True,
                         "animateRows": True,
-                        "domLayout": 'autoWidth',
+                        "domLayout": "autoWidth",
                     },
                     className="ag-theme-alpine",
                     style={"height": "500px", "width": "100%"},
@@ -122,6 +124,7 @@ class DisasterTable:
             ],
             className="w-full",
         )
+
 
 def register_table_callbacks(app: Any, data: pd.DataFrame) -> None:
     """Register callbacks for the disaster table visualization."""
@@ -134,9 +137,7 @@ def register_table_callbacks(app: Any, data: pd.DataFrame) -> None:
             Input("end-year-filter", "value"),
         ],
     )
-    def update_table(
-        start_year: int, end_year: int
-    ) -> list[dict[str, Any]]:
+    def update_table(start_year: int, end_year: int) -> list[dict[str, Any]]:
         filtered_data = data.copy()
 
         # Apply filters
