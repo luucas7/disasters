@@ -16,7 +16,7 @@ class Map:
 
     def create_figure(self, filtered_data: pd.DataFrame, impact_metric: str = "Density") -> go.Figure:
         """Create choropleth map figure from data"""
-        data_to_use = filtered_data if filtered_data is not None else self.data
+        data_to_use = filtered_data if not filtered_data.empty else self.data
 
         counts_by_country = (
             data_to_use.groupby(["ISO", "Country"])

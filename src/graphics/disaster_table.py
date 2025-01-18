@@ -65,6 +65,8 @@ class DisasterTable:
     def simplify_location(self, location: str) -> str:
         """Simplify location string by taking only the first part before any comma or parenthesis.
         To avoid values over extending"""
+        if pd.isna(location):
+            return ""
         parts = location.split(",")[0].split("(")[0].strip()
         if len(parts) > 30:
             return parts[:27] + "..."
@@ -72,7 +74,7 @@ class DisasterTable:
 
     def prepare_table_data(self, filtered_data: pd.DataFrame) -> list:
         """Prepare data for AG Grid table"""
-        data_to_use = filtered_data if filtered_data is not None else self.data
+        data_to_use = filtered_data if not filtered_data.empty else self.data
 
         # Process data: get deadliest disasters
         worst_disasters = data_to_use.sort_values("Total Deaths", ascending=False).head(
