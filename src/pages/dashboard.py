@@ -6,7 +6,7 @@ from dash import html, Dash
 from src.components.checkbox import Checkbox
 from src.components.filter import Filter
 from src.components.side_menu import SideMenu
-from src.components.card import Card
+from src.components.card import Card, register_card_callback
 
 # Graphics components
 from src.graphics.country_details import CountryDetails, register_details_callbacks
@@ -57,7 +57,7 @@ def create_dashboard_layout(app: Dash, data: pd.DataFrame, geojson: Dict[str, An
                     title="Geographic distribution of disasters",
                     filters=[disaster_filter, region_filter, map_impact_metric_filter],
                     caption="TODO"
-                )(Map(data, geojson, areas)(), app=app),
+                )(Map(data, geojson, areas)()),
                 
                 # Time series chart
                 Card(
@@ -65,7 +65,7 @@ def create_dashboard_layout(app: Dash, data: pd.DataFrame, geojson: Dict[str, An
                     title="Disaster occurrences through time",
                     filters=[group_by_filter, temporal_impact_metric_filter],
                     caption= "   Note : The trend in the number of disasters shows significant peaks in certain years, notably in 2010 with the devastating earthquake in Haiti (see Total Deaths in Impact Metric). In recent years, there has been a slight downward trend in the total number of disasters recorded, although their human impact remains highly variable depending on the event."
-                )(TimedCount(data)(), app=app),
+                )(TimedCount(data)()),
             ], className="flex-1 flex flex-col gap-4"),
             
             # Right column - Secondary visualizations and stats
@@ -75,13 +75,13 @@ def create_dashboard_layout(app: Dash, data: pd.DataFrame, geojson: Dict[str, An
                     id="details-card",
                     title="Country details",
                     caption="   Note : Exploring the data country by country, we discover very different profiles: the USA is mainly affected by storms and tornadoes, China records a high number of industrial accidents, while countries like Niger face recurrent epidemics. These differences reflect the specific vulnerabilities linked to each country's context: level of industrialization, healthcare system, or exposure to meteorological phenomena.",
-                )(CountryDetails(data)(), app=app),
+                )(CountryDetails(data)()),
                 
                 # Statistics Card
                 Card(
                     id="stats-card",
                     title="Database statistics"
-                )(Statistics(data)(), app=app),
+                )(Statistics(data)()),
                 
                 # Pie chart
                 Card(
@@ -90,14 +90,14 @@ def create_dashboard_layout(app: Dash, data: pd.DataFrame, geojson: Dict[str, An
                     filters=[pie_chart_group_checkbox, pie_chart_other_checkbox, pie_chart_country_checkbox],
                     caption="   Note : Although floods and storms are the most frequent disasters, earthquakes cause the most deaths. This difference can be explained by the sudden and unpredictable nature of earthquakes, making evacuation impossible, unlike floods and storms, which can often be anticipated thanks to weather forecasting systems.",
                     className='min-h-[900px]'
-                )(DisasterPieChart(data)(), app=app),
+                )(DisasterPieChart(data)()),
 
                 # Table
                 Card(
                     id="table-card",
                     title="Deadliest disasters",
                     filters=[]
-                )(DisasterTable(data)(), app=app),
+                )(DisasterTable(data)()),
 
             ], className="w-1/3 flex flex-col gap-4"),
 
@@ -115,3 +115,6 @@ def init_callbacks(app: Dash, data: pd.DataFrame, geojson: Dict[str, Any], areas
     register_statistics_callbacks(app, data)
     register_details_callbacks(app, data)
     register_table_callbacks(app, data)
+
+    for id in ["map-card", "temporal-card", "details-card", "stats-card", "pie-card", "table-card"]:
+        register_card_callback(app, id)

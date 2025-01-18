@@ -1,7 +1,6 @@
 from dash import html, Dash
 from typing import List, Optional
-from dash.dependencies import Input, Output, State, MATCH
-from . import logger
+from dash.dependencies import Input, Output, State
 
 class Card:
     """Base card component with consistent styling and fullscreen capability."""
@@ -12,11 +11,8 @@ class Card:
         self.filters = filters if filters is not None else []
         self.className = className
 
-    def __call__(self, children: List[html.Div], app: Optional[Dash] = None) -> html.Div:
-        # Register callback if app is provided
-        if app is not None:
-            self._register_callback(app)
-
+    def __call__(self, children: List[html.Div]) -> html.Div:
+        
         return html.Div(
             [
                 # Header avec style
@@ -47,21 +43,21 @@ class Card:
             className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-all duration-300 " + self.className,
         )
 
-    def _register_callback(self, app: Dash) -> None:
-        """Register the fullscreen toggle callback."""
-   
-        @app.callback(
-            Output(f"{self.id}-container", "className"),
-            Input(f"{self.id}-expand-btn", "n_clicks"),
-            State(f"{self.id}-container", "className"),
-            prevent_initial_call=True
-        )
-        def toggle_card_fullscreen(n_clicks: Optional[int], current_className: str) -> str:
+def register_card_callback(app: Dash, id: str) -> None:
+    """Register the fullscreen toggle callback."""
+
+    @app.callback(
+        Output(f"{id}-container", "className"),
+        Input(f"{id}-expand-btn", "n_clicks"),
+        State(f"{id}-container", "className"),
+        prevent_initial_call=True
+    )
+    def toggle_card_fullscreen(n_clicks: Optional[int], current_className: str) -> str:
+        
+        if n_clicks is None:
+            return current_className  # type: ignore[unreachable]
             
-            if n_clicks is None:
-                return current_className  # type: ignore[unreachable]
-                
-            if n_clicks % 2 == 1:  # Expand
-                return current_className + " fixed inset-4 z-50 overflow-auto w-[calc(100%-2rem)]"
-            else:  # Collapse
-                return current_className.replace(" fixed inset-4 z-50 overflow-auto w-[calc(100%-2rem)]", "")
+        if n_clicks % 2 == 1:  # Expand
+            return current_className + " fixed inset-4 z-50 overflow-auto w-[calc(100%-2rem)]"
+        else:  # Collapse
+            return current_className.replace(" fixed inset-4 z-50 overflow-auto w-[calc(100%-2rem)]", "")
