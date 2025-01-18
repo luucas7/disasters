@@ -11,6 +11,7 @@ class SideMenu:
         self.layout = self._create_layout()
     
     def _create_layout(self) -> html.Div:
+        """Create the layout for the side menu."""
         min_year = int(self.data["Start Year"].min()) if self.data is not None else None
         max_year = int(self.data["Start Year"].max()) if self.data is not None else None
         
@@ -58,6 +59,7 @@ class SideMenu:
         ], className="w-64 bg-blue border-r border-gray-200 h-screen fixed left-0 overflow-y-auto")
     
     def _get_year_options(self) -> list:
+        """Return a list of year options based on the data."""
         if self.data is not None:
             years = sorted(self.data["Start Year"].unique(), reverse=True)
             return [{"label": str(year), "value": year} for year in years]

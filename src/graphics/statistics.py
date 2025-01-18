@@ -6,6 +6,8 @@ from dash.dependencies import Input, Output
 
 
 class Statistics:
+    """Collection of reusable statistics components with consistent styling."""
+
     def __init__(self, data: pd.DataFrame):
         self.data = data
         self.layout = self._create_layout()
@@ -56,6 +58,8 @@ class Statistics:
             },
         )
 
+    # Static method to create a stat box,
+    # it is static because it does not depend on the instance of the class
     @staticmethod
     def _create_stat_box(
         title: str, id_prefix: str, initial_value: float = 0

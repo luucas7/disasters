@@ -91,7 +91,6 @@ def process_data(
             download_dir = str(os.path.abspath(raw_path))
             try:
                 from config import USERNAME, PASSWORD
-
                 logger.info("Downloading data from EMDAT website")
                 download_from_site(
                     URL, USERNAME, PASSWORD, download_dir, RAW_DISASTER_DATA_FILE

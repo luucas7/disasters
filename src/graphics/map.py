@@ -9,6 +9,8 @@ import dash
 
 
 class Map:
+    """Choropleth map visualization component."""
+    
     def __init__(self, data: pd.DataFrame, geojson: dict, areas: dict):
         self.data = data
         self.geojson = geojson

@@ -8,7 +8,7 @@ An interactive dashboard for analyzing and visualizing global data on natural an
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/Hyprra/disasters.git
+git clone https://github.com/luucas7/disasters.git
 cd disasters
 ```
 

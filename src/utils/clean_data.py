@@ -120,10 +120,10 @@ class EMDATCleaner:
     def normalize_country_names(self) -> "EMDATCleaner":
         """Normalize country names using ISO codes and country mapping."""
         if "ISO" in self.df.columns:
-            # Utiliser le code ISO pour déterminer le nom du pays
+            # Mapping ISO codes to country names
             self.df["Country"] = self.df["ISO"].map(ISO_TO_COUNTRY)
 
-            # Log des codes ISO qui n'ont pas de correspondance
+            # Check for missing ISO codes
             missing_iso = self.df[self.df["Country"].isna()]["ISO"].unique()
             if len(missing_iso) > 0:
                 logger.warning(f"Missing ISO code mappings for: {missing_iso}")

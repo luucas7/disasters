@@ -4,7 +4,7 @@ from dash import dcc, html
 
 
 class Filter:
-    """Collection of reusable filter components with enhanced styling."""
+    """Collection of reusable filter components with consistent styling."""
     
     def __init__(self, data: Any = None):
         self.data = data
