@@ -56,7 +56,7 @@ class SideMenu:
                 ], className="mb-4"),
             ], className="p-4")
             ], className="")
-        ], className="w-64 bg-blue border-r border-gray-200 h-screen fixed left-0 overflow-y-auto")
+        ], className="w-64 bg-blue border-r border-gray-200 h-screen fixed left-0 overflow-y-auto z-10")
     
     def _get_year_options(self) -> list:
         """Return a list of year options based on the data."""

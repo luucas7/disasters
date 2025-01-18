@@ -17,7 +17,7 @@ from src.graphics.statistics import Statistics, register_statistics_callbacks
 from src.graphics.timed_count import TimedCount, register_timed_count_callbacks
 
 
-def create_dashboard_layout(data: pd.DataFrame, geojson: Dict[str, Any], areas: Dict[str, float]) -> html.Div:
+def create_dashboard_layout(app: Dash, data: pd.DataFrame, geojson: Dict[str, Any], areas: Dict[str, float]) -> html.Div:
     """Create the main dashboard layout."""
     filters = Filter(data)
     disaster_filter = filters.disaster_filter("disaster-type-filter")
@@ -53,45 +53,51 @@ def create_dashboard_layout(data: pd.DataFrame, geojson: Dict[str, Any], areas: 
             html.Div([
                 # Map only
                 Card(
+                    id="map-card",
                     title="Geographic distribution of disasters",
                     filters=[disaster_filter, region_filter, map_impact_metric_filter],
                     caption="TODO"
-                )(Map(data, geojson, areas)()),
+                )(Map(data, geojson, areas)(), app=app),
                 
                 # Time series chart
                 Card(
+                    id="temporal-card",
                     title="Disaster occurrences through time",
                     filters=[group_by_filter, temporal_impact_metric_filter],
                     caption= "   Note : The trend in the number of disasters shows significant peaks in certain years, notably in 2010 with the devastating earthquake in Haiti (see Total Deaths in Impact Metric). In recent years, there has been a slight downward trend in the total number of disasters recorded, although their human impact remains highly variable depending on the event."
-                )(TimedCount(data)()),
+                )(TimedCount(data)(), app=app),
             ], className="flex-1 flex flex-col gap-4"),
             
             # Right column - Secondary visualizations and stats
             html.Div([
                 # Country details Card
                 Card(
+                    id="details-card",
                     title="Country details",
                     caption="   Note : Exploring the data country by country, we discover very different profiles: the USA is mainly affected by storms and tornadoes, China records a high number of industrial accidents, while countries like Niger face recurrent epidemics. These differences reflect the specific vulnerabilities linked to each country's context: level of industrialization, healthcare system, or exposure to meteorological phenomena.",
-                )(CountryDetails(data)()),
+                )(CountryDetails(data)(), app=app),
                 
                 # Statistics Card
                 Card(
+                    id="stats-card",
                     title="Database statistics"
-                )(Statistics(data)()),
+                )(Statistics(data)(), app=app),
                 
                 # Pie chart
                 Card(
+                    id="pie-card",
                     title="Disaster type distribution",
                     filters=[pie_chart_group_checkbox, pie_chart_other_checkbox, pie_chart_country_checkbox],
                     caption="   Note : Although floods and storms are the most frequent disasters, earthquakes cause the most deaths. This difference can be explained by the sudden and unpredictable nature of earthquakes, making evacuation impossible, unlike floods and storms, which can often be anticipated thanks to weather forecasting systems.",
                     className='min-h-[900px]'
-                )(DisasterPieChart(data)()),
+                )(DisasterPieChart(data)(), app=app),
 
                 # Table
                 Card(
+                    id="table-card",
                     title="Deadliest disasters",
                     filters=[]
-                )(DisasterTable(data)()),
+                )(DisasterTable(data)(), app=app),
 
             ], className="w-1/3 flex flex-col gap-4"),
 

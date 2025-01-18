@@ -14,6 +14,7 @@ class TimedCount:
         self.layout = html.Div(
             [
                 dcc.Graph(
+                    responsive=True,
                     id="time-series-chart",
                     style={"width": "95%"},
                     config={

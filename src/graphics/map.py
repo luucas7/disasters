@@ -94,8 +94,10 @@ class Map:
                     id="loading-map",
                     type="circle",
                     children=dcc.Graph(
+                        responsive=True,
                         figure=fig,
                         id="map",
+                        style={'height': '450px'},
                         config={
                             "doubleClick": "reset+autosize",
                             "scrollZoom": True,

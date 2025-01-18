@@ -119,6 +119,7 @@ class DisasterTable:
                         "pagination": True,
                         "paginationAutoPageSize": True,
                         "animateRows": True,
+                        "domLayout": 'autoWidth',
                     },
                     className="ag-theme-alpine",
                     style={"height": "500px", "width": "100%"},
