@@ -26,7 +26,7 @@ class Card:
                        
                         # Expand button
                         html.Button(
-                            "🔍",
+                            html.Img(src="/assets/maximize.svg", className="w-4 h-4", id=f"{self.id}-expand-icon"),
                             id=f"{self.id}-expand-btn",
                             className="p-2 hover:bg-gray-100 rounded transition-colors",
                             n_clicks=0
@@ -37,7 +37,7 @@ class Card:
                 if self.title
                 else None,
                 # Card content
-                html.Div(children, className="p-4"),
+                html.Div(children, className="p-3"),
             ],
             id=f"{self.id}-container",
             className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-all duration-300 " + self.className,
@@ -47,17 +47,23 @@ def register_card_callback(app: Dash, id: str) -> None:
     """Register the fullscreen toggle callback."""
 
     @app.callback(
-        Output(f"{id}-container", "className"),
+        [
+            Output(f"{id}-container", "className"),
+            Output(f"{id}-expand-icon", "src")
+        ],
         Input(f"{id}-expand-btn", "n_clicks"),
         State(f"{id}-container", "className"),
         prevent_initial_call=True
     )
-    def toggle_card_fullscreen(n_clicks: Optional[int], current_className: str) -> str:
-        
+    def toggle_card_fullscreen(n_clicks: Optional[int], current_className: str) -> tuple:
         if n_clicks is None:
-            return current_className  # type: ignore[unreachable]
+            return current_className, "/assets/maximize.svg"  # type: ignore[unreachable]
             
         if n_clicks % 2 == 1:  # Expand
-            return current_className + " fixed inset-4 z-50 overflow-auto w-[calc(100%-2rem)]"
+            new_class_name = current_className + " fixed inset-4 z-50 overflow-auto w-[calc(100%-2rem)]"
+            new_icon_src = "/assets/minimize.svg"
         else:  # Collapse
-            return current_className.replace(" fixed inset-4 z-50 overflow-auto w-[calc(100%-2rem)]", "")
+            new_class_name = current_className.replace(" fixed inset-4 z-50 overflow-auto w-[calc(100%-2rem)]", "")
+            new_icon_src = "/assets/maximize.svg"
+        
+        return new_class_name, new_icon_src

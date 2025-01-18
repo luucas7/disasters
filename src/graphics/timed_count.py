@@ -16,7 +16,7 @@ class TimedCount:
                 dcc.Graph(
                     responsive=True,
                     id="time-series-chart",
-                    style={"width": "95%"},
+                    style={"width": "95%", "height": "300px"},
                     config={
                         "displayModeBar": False,
                     },

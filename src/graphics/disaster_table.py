@@ -8,7 +8,7 @@ from dash.dependencies import Input, Output
 
 class DisasterTable:
     """Disaster table visualization component."""
-    
+
     def __init__(self, data: pd.DataFrame):
         self.data = data
         self.column_defs = [
@@ -17,8 +17,7 @@ class DisasterTable:
                 "headerName": "Year",
                 "filter": "agNumberColumnFilter",
                 "sortable": True,
-                "width": 100,
-                "headerClass": "text-blue-600",
+                "minWidth": 80,
             },
             {
                 "field": "Type",
@@ -26,23 +25,13 @@ class DisasterTable:
                 "filter": True,
                 "sortable": True,
                 "width": 150,
-                "headerClass": "text-blue-600",
             },
             {
                 "field": "Country",
                 "headerName": "Country",
                 "filter": True,
                 "sortable": True,
-                "width": 140,
-                "headerClass": "text-blue-600",
-            },
-            {
-                "field": "Location",
-                "headerName": "Location",
-                "filter": True,
-                "sortable": True,
-                "width": 180,
-                "headerClass": "text-blue-600",
+                "width": 130,
             },
             {
                 "field": "Deaths",
@@ -50,8 +39,14 @@ class DisasterTable:
                 "filter": "agNumberColumnFilter",
                 "sortable": True,
                 "type": "numericColumn",
-                "width": 120,
-                "headerClass": "text-blue-600",
+                "width": 100,
+            },
+            {
+                "field": "Location",
+                "headerName": "Location",
+                "filter": True,
+                "sortable": True,
+                "width": 180,
             },
             {
                 "field": "Damage",
@@ -59,16 +54,23 @@ class DisasterTable:
                 "filter": "agNumberColumnFilter",
                 "sortable": True,
                 "type": "numericColumn",
-                "width": 140,
-                "headerClass": "text-blue-600",
+                "width": 100,
             },
         ]
+        self.default_col_def = {
+            "resizable": True,
+            "sortable": True,
+            "filter": True,
+            "minWidth": 150,
+            "headerClass": "",
+            "autoSizeColumns": True,
+        }
 
     def simplify_location(self, location: str) -> str:
         """Simplify location string by taking only the first part before any comma or parenthesis.
         To avoid values over extending"""
         if pd.isna(location):
-            return "" # type: ignore[unreachable]
+            return ""  # type: ignore[unreachable]
         parts = location.split(",")[0].split("(")[0].strip()
         if len(parts) > 30:
             return parts[:27] + "..."
@@ -109,17 +111,12 @@ class DisasterTable:
                     columnDefs=self.column_defs,
                     rowData=table_data,
                     columnSize="sizeToFit",
-                    defaultColDef={
-                        "resizable": True,
-                        "sortable": True,
-                        "filter": True,
-                        "minWidth": 100,
-                    },
+                    defaultColDef=self.default_col_def,
                     dashGridOptions={
                         "pagination": True,
                         "paginationAutoPageSize": True,
                         "animateRows": True,
-                        "domLayout": 'autoWidth',
+                        "domLayout": "autoWidth",
                     },
                     className="ag-theme-alpine",
                     style={"height": "500px", "width": "100%"},
@@ -140,9 +137,7 @@ def register_table_callbacks(app: Any, data: pd.DataFrame) -> None:
             Input("end-year-filter", "value"),
         ],
     )
-    def update_table(
-        start_year: int, end_year: int
-    ) -> list[dict[str, Any]]:
+    def update_table(start_year: int, end_year: int) -> list[dict[str, Any]]:
         filtered_data = data.copy()
 
         # Apply filters
