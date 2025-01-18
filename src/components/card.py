@@ -21,7 +21,7 @@ class Card:
                         html.Div([
                             html.H3(self.title, className="text-lg font-semibold"),
                             html.P(self.caption, className="text-sm text-gray-500 italic ml-5 mt-2 mb-2") if self.caption else None,
-                            html.Div(self.filters, className="flex flex-wrap gap-4 mt-4") if self.filters else None,
+                            html.Div(self.filters, className="flex flex-wrap gap-4 my-4") if self.filters else None,
                         ], className="flex-1"),
                        
                         # Expand button
