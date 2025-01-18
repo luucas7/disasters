@@ -66,7 +66,7 @@ class DisasterTable:
         """Simplify location string by taking only the first part before any comma or parenthesis.
         To avoid values over extending"""
         if pd.isna(location):
-            return ""
+            return "" # type: ignore[unreachable]
         parts = location.split(",")[0].split("(")[0].strip()
         if len(parts) > 30:
             return parts[:27] + "..."
