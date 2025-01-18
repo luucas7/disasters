@@ -19,7 +19,7 @@ class Card:
                     [
                         html.H3(self.title, className="text-lg font-semibold"),
                         html.P(self.caption, className="text-sm text-gray-500 italic ml-5") if self.caption else None,
-                        html.Div(self.filters, className="flex flex-wrap gap-4 mt-3") if self.filters else None,
+                        html.Div(self.filters, className="flex flex-wrap gap-4 mt-4") if self.filters else None,
                     ],
                     className="p-4 border-b border-gray-300",
                 )
