@@ -1,10 +1,8 @@
-from typing import Any
-
+from typing import Any, List, Optional
 import dash_ag_grid as dag
 import pandas as pd
-from dash import html
-from dash.dependencies import Input, Output
-
+from dash import html, dcc
+from dash.dependencies import Input, Output, State
 
 class DisasterTable:
     """Disaster table visualization component."""
@@ -17,8 +15,7 @@ class DisasterTable:
                 "headerName": "Year",
                 "filter": "agNumberColumnFilter",
                 "sortable": True,
-                "width": 100,
-                "headerClass": "text-blue-600",
+                "minWidth":  80
             },
             {
                 "field": "Type",
@@ -26,23 +23,13 @@ class DisasterTable:
                 "filter": True,
                 "sortable": True,
                 "width": 150,
-                "headerClass": "text-blue-600",
             },
             {
                 "field": "Country",
                 "headerName": "Country",
                 "filter": True,
                 "sortable": True,
-                "width": 140,
-                "headerClass": "text-blue-600",
-            },
-            {
-                "field": "Location",
-                "headerName": "Location",
-                "filter": True,
-                "sortable": True,
-                "width": 180,
-                "headerClass": "text-blue-600",
+                "width": 130,
             },
             {
                 "field": "Deaths",
@@ -50,8 +37,14 @@ class DisasterTable:
                 "filter": "agNumberColumnFilter",
                 "sortable": True,
                 "type": "numericColumn",
-                "width": 120,
-                "headerClass": "text-blue-600",
+                "width": 100,
+            },
+            {
+                "field": "Location",
+                "headerName": "Location",
+                "filter": True,
+                "sortable": True,
+                "width": 180,
             },
             {
                 "field": "Damage",
@@ -59,16 +52,23 @@ class DisasterTable:
                 "filter": "agNumberColumnFilter",
                 "sortable": True,
                 "type": "numericColumn",
-                "width": 140,
-                "headerClass": "text-blue-600",
+                "width": 100,
             },
         ]
+        self.default_col_def = {
+            "resizable": True,
+            "sortable": True,
+            "filter": True,
+            "minWidth": 150,
+            "headerClass": "",
+            "autoSizeColumns": True,
+        }
 
     def simplify_location(self, location: str) -> str:
         """Simplify location string by taking only the first part before any comma or parenthesis.
         To avoid values over extending"""
         if pd.isna(location):
-            return "" # type: ignore[unreachable]
+            return ""  # type: ignore[unreachable]
         parts = location.split(",")[0].split("(")[0].strip()
         if len(parts) > 30:
             return parts[:27] + "..."
@@ -109,12 +109,7 @@ class DisasterTable:
                     columnDefs=self.column_defs,
                     rowData=table_data,
                     columnSize="sizeToFit",
-                    defaultColDef={
-                        "resizable": True,
-                        "sortable": True,
-                        "filter": True,
-                        "minWidth": 100,
-                    },
+                    defaultColDef=self.default_col_def,
                     dashGridOptions={
                         "pagination": True,
                         "paginationAutoPageSize": True,
@@ -127,7 +122,6 @@ class DisasterTable:
             ],
             className="w-full",
         )
-
 
 def register_table_callbacks(app: Any, data: pd.DataFrame) -> None:
     """Register callbacks for the disaster table visualization."""
