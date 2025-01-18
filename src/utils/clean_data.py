@@ -236,4 +236,4 @@ def process_and_clean_data(input_df: pd.DataFrame) -> pd.DataFrame:
 
     except Exception as e:
         logger.error(f"Error in data cleaning process: {str(e)}")
-        return None
+        return pd.DataFrame()

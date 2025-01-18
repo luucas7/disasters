@@ -4,7 +4,7 @@ from dash import html
 class Navbar:
     """Navigation bar component."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.layout = html.Nav(
             html.Div(
                 [
@@ -46,5 +46,5 @@ class Navbar:
             className="bg-blue-800 h-20 w-full z-50 relative",  # Increased height for subtitle
         )
 
-    def __call__(self):
+    def __call__(self) -> html.Nav:
         return self.layout

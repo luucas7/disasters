@@ -14,7 +14,7 @@ class Checkbox:
         self.options = options
         self.value = value if value is not None else []
 
-    def __call__(self):
+    def __call__(self) -> html.Div:
         return html.Div([
             dcc.Checklist(
                 id=self.id,

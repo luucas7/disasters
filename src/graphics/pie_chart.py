@@ -1,9 +1,12 @@
+from typing import Any, Dict
+
+import pandas as pd
 import plotly.graph_objects as go
-from dash import dcc, html
+from dash import Dash, dcc, html
 from dash.dependencies import Input, Output
 
 
-def group_similar_disasters(data, group=False):
+def group_similar_disasters(data: Any, group: bool = False) -> Any:
     if not group:
         return data
 
@@ -24,7 +27,7 @@ def group_similar_disasters(data, group=False):
 
 
 class DisasterPieChart:
-    def __init__(self, data=None):
+    def __init__(self, data: Any = None) -> None:
         self.data = data
         self.layout = html.Div(
             [
@@ -43,11 +46,11 @@ class DisasterPieChart:
             className="h-full flex flex-col",
         )
 
-    def __call__(self):
+    def __call__(self) -> html.Div:
         return self.layout
 
 
-def register_pie_callbacks(app, data):
+def register_pie_callbacks(app: Dash, data: pd.DataFrame) -> None:
     @app.callback(
         Output("disaster-pie-chart", "figure"),
         [
@@ -60,8 +63,13 @@ def register_pie_callbacks(app, data):
         ],
     )
     def update_pie(
-        group_similar, show_other, start_year, end_year, show_country, clickData
-    ):
+        group_similar: Any,
+        show_other: Any,
+        start_year: int,
+        end_year: int,
+        show_country: Any,
+        clickData: Dict[str, Any],
+    ) -> go.Figure:
         start_year = start_year if start_year is not None else data["Start Year"].min()
         end_year = end_year if end_year is not None else data["Start Year"].max()
 

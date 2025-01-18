@@ -11,7 +11,7 @@ class Card:
         self.filters = filters
         self.className = className
 
-    def __call__(self, children):
+    def __call__(self, children: List[html.Div]) -> html.Div:
         return html.Div(
             [
                 # Header avec style

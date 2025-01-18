@@ -3,14 +3,18 @@ from dash.dependencies import Input, Output
 from dash import dcc, html
 import numpy as np
 
+import pandas as pd
+
+import dash
+
 
 class Map:
-    def __init__(self, data, geojson, areas):
+    def __init__(self, data: pd.DataFrame, geojson: dict, areas: dict):
         self.data = data
         self.geojson = geojson
         self.areas = areas
 
-    def create_figure(self, filtered_data=None, impact_metric="Density"):
+    def create_figure(self, filtered_data: pd.DataFrame, impact_metric: str = "Density") -> go.Figure:
         """Create choropleth map figure from data"""
         data_to_use = filtered_data if filtered_data is not None else self.data
 
@@ -82,8 +86,8 @@ class Map:
 
         return fig
 
-    def __call__(self):
-        fig = self.create_figure()
+    def __call__(self) -> html.Div:
+        fig = self.create_figure(pd.DataFrame())
         return html.Div(
             [
                 dcc.Loading(
@@ -104,7 +108,7 @@ class Map:
         )
 
 
-def register_map_callbacks(app, data, geojson, areas):
+def register_map_callbacks(app: dash, data: pd.DataFrame, geojson: dict, areas: dict) -> None:
     map_viz = Map(data, geojson, areas)
 
     @app.callback(
@@ -117,7 +121,7 @@ def register_map_callbacks(app, data, geojson, areas):
             Input("map-impact-metric-filter", "value"),
         ],
     )
-    def update_map(disaster_type, region, start_year, end_year, impact_metric):
+    def update_map(disaster_type: str, region: str, start_year: int, end_year: int, impact_metric: str) -> go.Figure:
         filtered_data = data.copy()
 
         # Apply filters

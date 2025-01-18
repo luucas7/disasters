@@ -1,5 +1,7 @@
 from typing import Any, Dict
 
+import dash
+import pandas as pd
 import plotly.graph_objects as go
 from dash import dcc, html
 from dash.dependencies import Input, Output
@@ -8,7 +10,7 @@ from dash.dependencies import Input, Output
 class TimedCount:
     """Time series visualization component."""
 
-    def __init__(self, data=None):
+    def __init__(self, data: Any = None) -> None:
         self.data = data
         self.layout = html.Div(
             [
@@ -92,11 +94,11 @@ class TimedCount:
 
         return fig
 
-    def __call__(self):
+    def __call__(self) -> html.Div:
         return self.layout
 
 
-def register_timed_count_callbacks(app, data):
+def register_timed_count_callbacks(app: dash, data: pd.DataFrame) -> None:
     @app.callback(
         Output("time-series-chart", "figure"),
         [

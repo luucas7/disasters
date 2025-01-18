@@ -1,14 +1,12 @@
 import json
-import os
+from typing import Optional, Dict, Any
 from pathlib import Path
-from typing import Any, Dict, Optional
-
 import pandas as pd
 from pandas import DataFrame
-
 from . import logger
 from .clean_data import process_and_clean_data
 from .scraper import download_from_site
+import os
 
 RAW_DISASTER_DATA_FILE = "public_emdat.xlsx"
 
@@ -92,7 +90,7 @@ def process_data(
             URL = "https://public.emdat.be"
             download_dir = str(os.path.abspath(raw_path))
             try:
-                from config import PASSWORD, USERNAME
+                from config import USERNAME, PASSWORD
 
                 logger.info("Downloading data from EMDAT website")
                 download_from_site(
@@ -115,8 +113,6 @@ def process_data(
 
         # Clean data
         cleaned_df = process_and_clean_data(raw_df)
-        if cleaned_df is None:
-            return {"success": False, "error": "Failed to clean data"}
 
         # Save cleaned data
         final_df_path = clean_path / "cleaned_disasters.csv"
@@ -144,10 +140,10 @@ def load_json_file(file_path: Path) -> Dict[str, Any]:
 
     except FileNotFoundError:
         logger.error(f"GeoJSON file not found in {file_path}")
-        return None
+        return dict()
     except Exception as e:
         logger.error(f"Error reading GeoJSON file: {e}")
-        return None
+        return dict()
 
 
 def load_areas_file(file_path: Path) -> Dict[str, float]:
@@ -170,7 +166,7 @@ def load_areas_file(file_path: Path) -> Dict[str, float]:
 
     except FileNotFoundError:
         logger.error(f"Areas file not found in {file_path}")
-        return None
+        return dict()
     except Exception as e:
         logger.error(f"Error reading areas file: {e}")
-        return None
+        return dict()

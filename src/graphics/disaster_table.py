@@ -65,14 +65,12 @@ class DisasterTable:
     def simplify_location(self, location: str) -> str:
         """Simplify location string by taking only the first part before any comma or parenthesis.
         To avoid values over extending"""
-        if pd.isna(location):
-            return ""
         parts = location.split(",")[0].split("(")[0].strip()
         if len(parts) > 30:
             return parts[:27] + "..."
         return parts.strip()
 
-    def prepare_table_data(self, filtered_data: pd.DataFrame = None) -> list:
+    def prepare_table_data(self, filtered_data: pd.DataFrame) -> list:
         """Prepare data for AG Grid table"""
         data_to_use = filtered_data if filtered_data is not None else self.data
 
@@ -98,8 +96,8 @@ class DisasterTable:
             for _, row in worst_disasters.iterrows()
         ]
 
-    def __call__(self):
-        table_data = self.prepare_table_data()
+    def __call__(self) -> html.Div:
+        table_data = self.prepare_table_data(pd.DataFrame())
         return html.Div(
             [
                 dag.AgGrid(
@@ -141,7 +139,7 @@ def register_table_callbacks(app: Any, data: pd.DataFrame) -> None:
     )
     def update_table(
         disaster_type: str, region: str, start_year: int, end_year: int
-    ) -> list:
+    ) -> list[dict[str, Any]]:
         filtered_data = data.copy()
 
         # Apply filters

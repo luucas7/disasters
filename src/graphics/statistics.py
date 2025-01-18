@@ -6,7 +6,7 @@ from dash.dependencies import Input, Output
 
 
 class Statistics:
-    def __init__(self, data: pd.DataFrame = None):
+    def __init__(self, data: pd.DataFrame):
         self.data = data
         self.layout = self._create_layout()
 

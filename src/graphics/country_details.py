@@ -1,5 +1,6 @@
 from typing import Optional
 
+import dash
 import pandas as pd
 from dash import html
 from dash.dependencies import Input, Output
@@ -71,7 +72,7 @@ class CountryDetails:
         ).items():
             percentage = (count / total_disasters) * 100
             disaster_rows.append(
-                self.create_disaster_row(disaster_type, count, percentage)
+                self.create_disaster_row(str(disaster_type), count, percentage)
             )
 
         return html.Div(
@@ -104,7 +105,7 @@ class CountryDetails:
         return html.Div(id="country-details-content", className="h-full")
 
 
-def register_details_callbacks(app, data):
+def register_details_callbacks(app: dash, data: pd.DataFrame) -> None:
     """Register callbacks for the details card."""
 
     @app.callback(
@@ -117,7 +118,13 @@ def register_details_callbacks(app, data):
             Input("end-year-filter", "value"),
         ],
     )
-    def update_details(clickData, disaster_type, region, start_year, end_year):
+    def update_details(
+        clickData: Optional[dict],
+        disaster_type: Optional[str],
+        region: Optional[str],
+        start_year: Optional[int],
+        end_year: Optional[int],
+    ) -> html.Div:
         filtered_data = data.copy()
 
         # Apply filters
