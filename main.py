@@ -58,6 +58,12 @@ def initialize_app(force_clean: bool = False, force_scrape: bool = False) -> das
         suppress_callback_exceptions=True,
     )
 
+    server = app.server 
+    @server.route("/health")
+    def health():
+        return "OK", 200
+
+
     # Set up layout
     app.layout = create_dashboard_layout(app, data, geojson, areas)
 
@@ -67,17 +73,20 @@ def initialize_app(force_clean: bool = False, force_scrape: bool = False) -> das
     return app
 
 
+
+args = parse_arguments()
+app = initialize_app(force_clean=args.clean, force_scrape=args.scrape)
+server = app.server
+
 def main() -> None:
     """Main function to launch the dashboard."""
     # Parse command line arguments
     args = parse_arguments()
 
-    # Initialize app with parsed arguments
-    app = initialize_app(force_clean=args.clean, force_scrape=args.scrape)
 
+    import os
     # Run server with specified port
-    app.run_server(debug=True, port=args.port)
-
+    app.run_server(debug=False, port=int(os.environ.get("PORT",args.port)), host="0.0.0.0")
 
 if __name__ == "__main__":
     main()
