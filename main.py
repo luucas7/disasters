@@ -1,33 +1,9 @@
-import argparse
-
+import os
 import dash
 
 from src.pages.dashboard import create_dashboard_layout, init_callbacks
 from src.utils.get_data import load_areas_file, load_json_file, process_data
 from src.utils.settings import get_project_paths
-
-
-def parse_arguments() -> argparse.Namespace:
-    """
-    Parse command line arguments.
-
-    Returns:
-        Parsed command line arguments
-    """
-    parser = argparse.ArgumentParser(
-        description="Dashboard launching script with data processing options"
-    )
-    parser.add_argument(
-        "--clean", action="store_true", help="Force cleaning of existing data"
-    )
-    parser.add_argument("--scrape", action="store_true", help="Force new data scraping")
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=8050,
-        help="Port to run the dashboard on (default: 8050)",
-    )
-    return parser.parse_args()
 
 
 def initialize_app(force_clean: bool = False, force_scrape: bool = False) -> dash.Dash:
@@ -58,11 +34,11 @@ def initialize_app(force_clean: bool = False, force_scrape: bool = False) -> das
         suppress_callback_exceptions=True,
     )
 
-    server = app.server 
+    server = app.server
+
     @server.route("/health")
     def health():
         return "OK", 200
-
 
     # Set up layout
     app.layout = create_dashboard_layout(app, data, geojson, areas)
@@ -73,20 +49,29 @@ def initialize_app(force_clean: bool = False, force_scrape: bool = False) -> das
     return app
 
 
+# Expose server for Gunicorn
+app = initialize_app()
+server = app.server  # Gunicorn va chercher cette variable
 
-args = parse_arguments()
-app = initialize_app(force_clean=args.clean, force_scrape=args.scrape)
-server = app.server
 
 def main() -> None:
     """Main function to launch the dashboard."""
-    # Parse command line arguments
-    args = parse_arguments()
+    import argparse  # Déplacement de argparse ici pour éviter les conflits
 
+    parser = argparse.ArgumentParser(
+        description="Dashboard launching script with data processing options"
+    )
+    parser.add_argument("--clean", action="store_true", help="Force cleaning of existing data")
+    parser.add_argument("--scrape", action="store_true", help="Force new data scraping")
+    parser.add_argument("--port", type=int, default=8050, help="Port to run the dashboard on (default: 8050)")
+    args = parser.parse_args()
 
-    import os
-    # Run server with specified port
-    app.run_server(debug=False, port=int(os.environ.get("PORT",args.port)), host="0.0.0.0")
+    # Utiliser $PORT si défini par DigitalOcean, sinon l'argument CLI
+    port = int(os.environ.get("PORT", args.port))
+
+    # Lancer le serveur
+    app.run_server(debug=False, port=port, host="0.0.0.0")
+
 
 if __name__ == "__main__":
     main()
