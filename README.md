@@ -225,4 +225,4 @@ Key findings from the data visualization:
 
 ## Copyright
 
-I hereby declare that all code in this project has been produced entirely by me/us.
+I hereby declare that all code in this project has been produced entirely by us.
