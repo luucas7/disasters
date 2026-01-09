@@ -18,6 +18,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 COPY . .
 
+# Prétraiter les données durant le build pour accélérer le démarrage du conteneur
+RUN python -c "from src.utils.get_data import process_data; from src.utils.settings import get_project_paths; process_data(get_project_paths()['data'])"
+
 RUN chown -R appuser:appuser /app
 
 USER appuser
