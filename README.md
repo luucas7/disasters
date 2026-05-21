@@ -1,5 +1,14 @@
 # Global Disasters Dashboard
 
+## EM-DAT
+
+EM-DAT is facing an urgent funding crisis. Following the suspension of USAID support, the future of this open-access service is at risk, and they could use your help to preserve it.
+
+How you can help:
+Please sign and share the open letter, written by EM-DAT users in support of the database: https://openletter.earth/the-worlds-collective-disaster-memory-must-be-preserved-66c88c44
+Every signature strengthens the case for sustained funding.
+
+
 An interactive dashboard for analyzing and visualizing global data on natural and technological disasters, based on the [EM-DAT](https://public.emdat.be/) database.
 
 ## Prerequisites
