@@ -3,7 +3,7 @@ import dash
 
 from src.pages.dashboard import create_dashboard_layout, init_callbacks
 from src.utils.get_data import load_areas_file, load_json_file, process_data
-from src.utils.settings import get_project_paths
+from src.utils.settings import get_base_path, get_project_paths
 
 
 def initialize_app(force_clean: bool = False, force_scrape: bool = False) -> dash.Dash:
@@ -28,8 +28,11 @@ def initialize_app(force_clean: bool = False, force_scrape: bool = False) -> das
     areas = load_areas_file(paths["areas_file"])
 
     # Initialize app
+    # assets_folder is set explicitly so the packaged executable (PyInstaller)
+    # serves the bundled assets from sys._MEIPASS instead of the source tree.
     app = dash.Dash(
         __name__,
+        assets_folder=str(get_base_path() / "assets"),
         external_stylesheets=["/assets/tailwind.min.css"],
         suppress_callback_exceptions=True,
     )

@@ -71,6 +71,36 @@ python main.py --clean
 http://127.0.0.1:8050/
 ```
 
+### Standalone Executable (Windows, no Python required)
+
+For non-technical users, the dashboard can be shipped as a single self-contained
+`.exe`. Double-clicking it processes the bundled data, starts a local server and
+**automatically opens the dashboard in the default browser** — no Python install,
+no virtual environment, no command line.
+
+**Getting the executable**
+
+- Download `disasters.exe` from the latest GitHub release, or from the
+  artifacts of the *Build Windows Executable* GitHub Actions run, or
+- Build it yourself (see below).
+
+**Building it yourself**
+
+PyInstaller does not cross-compile, so a Windows `.exe` must be built on Windows.
+On a Windows machine with Python 3.10+:
+
+```bash
+pip install -r requirements.txt pyinstaller
+pyinstaller disasters.spec --noconfirm
+```
+
+The executable is written to `dist/disasters.exe`. The same command on
+Linux/macOS produces a native binary for that platform instead.
+
+The CI workflow `.github/workflows/build-exe.yml` builds the Windows executable
+automatically (run it manually via *workflow_dispatch*, or push a `v*` tag to
+attach the `.exe` to a release).
+
 ## Data
 
 This project uses [EM-DAT](https://public.emdat.be/) data which includes:
