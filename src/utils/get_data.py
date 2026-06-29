@@ -5,7 +5,6 @@ import pandas as pd
 from pandas import DataFrame
 from . import logger
 from .clean_data import process_and_clean_data
-from .scraper import download_from_site
 import os
 
 RAW_DISASTER_DATA_FILE = "public_emdat.xlsx"
@@ -90,6 +89,9 @@ def process_data(
             URL = "https://public.emdat.be"
             download_dir = str(os.path.abspath(raw_path))
             try:
+                # Imported lazily: selenium is only required when scraping, so
+                # the packaged executable can ship without it.
+                from .scraper import download_from_site
                 from config import USERNAME, PASSWORD
                 logger.info("Downloading data from EMDAT website")
                 download_from_site(
