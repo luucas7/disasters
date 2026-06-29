@@ -75,8 +75,7 @@ http://127.0.0.1:8050/
 
 For non-technical users, the dashboard can be shipped as a single self-contained
 `.exe`. Double-clicking it processes the bundled data, starts a local server and
-**automatically opens the dashboard in the default browser** — no Python install,
-no virtual environment, no command line.
+**automatically opens the dashboard in the default browser**, no command line.
 
 **Getting the executable**
 
